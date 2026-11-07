@@ -8,7 +8,7 @@
 Swap the roles if your real split is different. Judges ask each person about *their own* part.
 
 **Before recording**
-- Have the site open (localhost:7860 or the Hugging Face link), scrolled to the top.
+- Have the site open (localhost:7860 or the live link https://kevinisaacbtech24--autolens.us-east.modal.run), scrolled to the top.
 - Have these photos ready in a folder: a flower photo (the tulips), a 2024 Aston Martin, the older Toyota Camry front view, and one dark or low-quality car photo.
 - Use a 1920×1080 screen recording at normal zoom. Move the mouse slowly; the page animations react to it.
 - Each section below gives the time, the speaker, **[ON SCREEN]** for what to show, and the words to say.
@@ -209,7 +209,7 @@ Our limits: year is only learned for the 196 classes, and only one main car per 
 **KEVIN:**
 "The app is a FastAPI backend with a custom web interface. It has loading, error, 'no car' and 'unknown model' states, it handles bad files and huge uploads safely, and it works on phones. The animations are built with Motion, the successor of Framer Motion.
 
-It's deployed with Docker on Hugging Face Spaces. The GitHub repository has the full source code, the architecture diagram, the design document, our evaluation file with all metrics in the brief's order, and the ablation and failure analysis. One command, `python -m scripts.run_all`, reproduces every number.
+It's deployed on Modal as a cloud container, and there's also a Dockerfile. The GitHub repository has the full source code, the architecture diagram, the design document, our evaluation file with all metrics in the brief's order, and the ablation and failure analysis. One command, `python -m scripts.run_all`, reproduces every number.
 
 To sum up: AutoLens finds the car, measures and repairs the image, names it at **95.9% top-1**, and when it isn't sure, it tells you instead of guessing. Thank you!"
 

@@ -18,7 +18,7 @@ from huggingface_hub import HfApi
 from src import config as C
 
 IGNORE = ["runs/*", "*.log", "__pycache__/*", "**/__pycache__/*", ".gradio/*", "yolo11*.pt",
-          "results/failures/*", ".venv/*", "*.pyc", "docs/*.pptx"]
+          "results/failures/*", ".venv/*", "*.pyc", "docs/*.pptx", ".git/*", ".claude/*", "~$*"]
 
 
 def main():

@@ -350,7 +350,7 @@ Galleries: `results/failures/*.jpg`. All 9 cases are in the design document (sec
 | Design document | Done (`docs/design_document.md`); team table filled in |
 | `eval_P5_<TeamID>.md` | Done as `eval_P5_T80.md` (USNs on the first line) |
 | Ablation + failure analysis | Done (eval file sections 7-8, design document section 9) |
-| Live hosted URL | **Pending**: needs a Hugging Face account and login; `scripts/deploy_hf.py` is ready |
+| Live hosted URL | Done: https://kevinisaacbtech24--autolens.us-east.modal.run (Modal) |
 | GitHub repository | **Pending**: needs Git or GitHub Desktop + Git LFS (the CLIP model file is 165 MB) |
 
 ---
@@ -394,6 +394,6 @@ Galleries: `results/failures/*.jpg`. All 9 cases are in the design document (sec
 - **Classical CV and ML:** OpenCV, scikit-image, scikit-learn.
 - **Optimisation:** ONNX Runtime.
 - **App:** FastAPI + Uvicorn backend; vanilla JS + Motion frontend.
-- **Deployment:** Docker for Hugging Face Spaces.
+- **Deployment:** Modal (`modal_app.py`), plus a `Dockerfile` for any Docker host.
 - **Hardware:** RTX 5060 Laptop GPU (8 GB).
 - **Reproduce everything:** `python -m scripts.run_all` (about 2.5 h on this GPU).

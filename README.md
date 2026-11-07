@@ -45,12 +45,12 @@ FP16 ConvNeXt: 53 MB, 5.5 ms GPU. INT8 (ONNX): 27 MB, -0.14 points. CLIP fine-tu
 App latency: about 0.15 s per request on GPU.
 
 Model files above 100 MB (`models/clip_ft_fp16.pt`) need Git LFS on GitHub (`.gitattributes` is
-included). The Hugging Face upload script handles them automatically.
+included).
 Full tables: [`eval_P5_T80.md`](eval_P5_T80.md).
 
 - **Team:** Kevin Isaac (1RUA24CSE0200), Kokila C G (1RUA24CSE0206), Dhruthishree V (1RUA24CSE0130)
 - **Repository:** https://github.com/kevinlochan31/fine-grained-vehicle-recognition
-- **Live demo:** _add the hosted URL here_
+- **Live demo:** https://kevinisaacbtech24--autolens.us-east.modal.run
 - **Evaluation file:** [`eval_P5_T80.md`](eval_P5_T80.md)
 - **Design document:** [`docs/design_document.md`](docs/design_document.md)
 - **Architecture diagram:** [`docs/architecture.png`](docs/architecture.png)
@@ -142,18 +142,30 @@ Set `CVH_BACKEND=onnx` to use the INT8-quantised ONNX classifier on CPU.
 Seeds are fixed (`SEED=42`); the validation split is a stratified 10% of the official training set, and
 the official 8,041-image test split is used only for final evaluation.
 
-## Deploying a public URL (Hugging Face Spaces, free)
+## Deploying the public URL (Modal)
 
-1. Create an account at https://huggingface.co and a **write** token (Settings -> Access Tokens).
-2. Log in on your machine (the token is stored locally, never in the repo):
+The live demo runs on [Modal](https://modal.com) as a CPU container (2 cores, 6 GB RAM), defined in
+`modal_app.py` (image with CPU PyTorch + requirements, CLIP weights pre-fetched at build time).
+
+1. Install the client and sign in once (browser-based; the token is stored locally, never in the repo):
    ```bash
-   hf auth login
+   pip install modal
    ```
-3. Upload; the Space builds the `Dockerfile` and serves the app:
    ```bash
-   python -m scripts.deploy_hf --space YOUR_USERNAME/fine-grained-cars
+   modal token new
    ```
-4. The app is at `https://huggingface.co/spaces/YOUR_USERNAME/fine-grained-cars` (first build takes ~10 min).
+2. Deploy (prints the public https URL; first build about 4 minutes):
+   ```bash
+   modal deploy modal_app.py
+   ```
+
+A warm container answers a scan in about 1-4 s. After 20 minutes without traffic it scales to zero and the
+next request takes up to about 2.5 minutes to start, so keep one container warm during judging:
+```bash
+KEEP_WARM=1 modal deploy modal_app.py
+```
+(Windows PowerShell: `$env:KEEP_WARM="1"; modal deploy modal_app.py`.) The same app also runs anywhere
+Docker runs (`Dockerfile`), e.g. a Hugging Face Space with `python -m scripts.deploy_hf`.
 
 ## Limitations and ethics (summary - details in the design document)
 

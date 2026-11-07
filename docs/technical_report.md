@@ -6,8 +6,8 @@
 | **Problem Title** | Intelligent Fine-Grained Vehicle Recognition and Analysis System |
 | **Team Name** | Not registered (Team ID: T80) |
 | **Team Members** | Kevin Isaac (1RUA24CSE0200), Kokila C G (1RUA24CSE0206), Dhruthishree V (1RUA24CSE0130) |
-| **GitHub Repository** | https://github.com/kevinlochan31/fine-grained-vehicle-recognition (commit: `[hash]`) |
-| **Live Demo / Deployment** | `[Hugging Face Space URL]` (Docker app "AutoLens"; runs locally with `python app.py`) |
+| **GitHub Repository** | https://github.com/kevinlochan31/fine-grained-vehicle-recognition (commit evaluated: `7034f4d`) |
+| **Live Demo / Deployment** | https://kevinisaacbtech24--autolens.us-east.modal.run (Modal, CPU container; runs locally with `python app.py`) |
 
 ---
 
@@ -275,14 +275,14 @@ python -m scripts.write_report --team <TeamID> --usns "<USN1>,<USN2>,..."
   - Upload / paste / camera input.
   - Loading, error, "no car", "unknown model" and low-confidence states.
   - Live classical vs deep vs hybrid comparison.
-* **Packaging:** `Dockerfile` for Hugging Face Spaces (`scripts/deploy_hf.py`).
+* **Packaging:** `modal_app.py` deploys the live demo on Modal (CPU container); the `Dockerfile` runs it on any Docker host (e.g. Hugging Face Spaces via `scripts/deploy_hf.py`).
   - Weights: PyTorch FP16, with an optional ONNX INT8 classifier (`CVH_BACKEND=onnx`).
   - The 165 MB CLIP weight file is tracked with Git LFS (`.gitattributes`).
 
 ---
 
 ### Student Submission Checklist
-- [ ] Working GitHub repository link included with an updated `README.md`.
+- [x] Working GitHub repository link included with an updated `README.md`.
 - [x] No raw code pasted into this report.
 - [x] All table metrics match test runs reproducible via the repository (`python -m scripts.run_all`).
 - [x] All team member details accurately recorded.

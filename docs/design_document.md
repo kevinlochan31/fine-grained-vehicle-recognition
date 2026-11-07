@@ -6,7 +6,7 @@
 | Team ID | T80 |
 | Members / USNs | Kevin Isaac (1RUA24CSE0200), Kokila C G (1RUA24CSE0206), Dhruthishree V (1RUA24CSE0130) |
 | Repository | https://github.com/kevinlochan31/fine-grained-vehicle-recognition |
-| Live application | (Hugging Face Space URL) |
+| Live application | https://kevinisaacbtech24--autolens.us-east.modal.run |
 
 ## 1. Problem statement and goals
 
@@ -349,8 +349,15 @@ Accuracy is on the 788-image validation split and a fixed 1,500-image test subse
 - Bad inputs (no file, non-image, tiny, blank, RGBA/greyscale, huge) are validated with clear error messages;
   files over 15 MB are refused before upload and on the server; unexpected errors are caught and shown
   without stack traces.
-- The `Dockerfile` builds a CPU image; the same repository can be pushed to a Hugging Face Space
-  (Docker SDK) for a public URL. `CVH_BACKEND=onnx` switches to the INT8 ONNX classifier.
+- **Live deployment: Modal** (https://kevinisaacbtech24--autolens.us-east.modal.run), defined in
+  `modal_app.py`. It is a CPU container (2 cores, 6 GB RAM) with CPU PyTorch and the CLIP weights
+  pre-fetched into the image.
+  - Measured on the live URL: a warm container answers a full scan (all three pipelines) in about
+    2-4 s end to end, of which 0.3-0.9 s is server compute.
+  - A cold start after 20 idle minutes takes up to about 2.5 minutes, so `KEEP_WARM=1` keeps one container
+    running during judging.
+- The `Dockerfile` builds the same CPU image for any Docker host (e.g. a Hugging Face Space via
+  `scripts/deploy_hf.py`). `CVH_BACKEND=onnx` switches to the INT8 ONNX classifier.
 - No secrets are needed or committed.
 
 ## 12. Limitations
