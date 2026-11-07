@@ -1,0 +1,3544 @@
+{
+ "selection": "max (correct name + correct make - wrong) on simulated unseen val cars, mean of both scenarios",
+ "unknown_make_weight": 0.5,
+ "open_name_conf": 0.8,
+ "unknown_make_conf": 0.4,
+ "n_test": 5266,
+ "grid": [
+  {
+   "w": 0.0,
+   "name_conf": 0.1,
+   "make_conf": 0.3,
+   "val_score": 0.01941747572815533,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.036893203883495145,
+    "unknown": 0.007766990291262136,
+    "wrong": 0.23300970873786409,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.1941747572815534,
+    "unknown": 0.038834951456310676,
+    "wrong": 0.7242718446601941,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.1,
+   "make_conf": 0.4,
+   "val_score": 0.01941747572815533,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.03300970873786408,
+    "unknown": 0.013592233009708738,
+    "wrong": 0.23106796116504855,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.18058252427184465,
+    "unknown": 0.06796116504854369,
+    "wrong": 0.7087378640776699,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.1,
+   "make_conf": 0.5,
+   "val_score": 0.029126213592232997,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.031067961165048542,
+    "unknown": 0.017475728155339806,
+    "wrong": 0.229126213592233,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.170873786407767,
+    "unknown": 0.10679611650485436,
+    "wrong": 0.6796116504854369,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.1,
+   "make_conf": 0.6,
+   "val_score": 0.02815533980582524,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.02524271844660194,
+    "unknown": 0.02524271844660194,
+    "wrong": 0.22718446601941747,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.15728155339805824,
+    "unknown": 0.13592233009708737,
+    "wrong": 0.6640776699029126,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.1,
+   "make_conf": 0.7,
+   "val_score": 0.02815533980582524,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.03300970873786408,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.141747572815534,
+    "unknown": 0.1669902912621359,
+    "wrong": 0.6485436893203883,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.2,
+   "make_conf": 0.3,
+   "val_score": 0.020388349514563087,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.036893203883495145,
+    "unknown": 0.007766990291262136,
+    "wrong": 0.23300970873786409,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.1941747572815534,
+    "unknown": 0.040776699029126215,
+    "wrong": 0.7223300970873786,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.2,
+   "make_conf": 0.4,
+   "val_score": 0.020388349514563087,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.03300970873786408,
+    "unknown": 0.013592233009708738,
+    "wrong": 0.23106796116504855,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.18058252427184465,
+    "unknown": 0.06990291262135923,
+    "wrong": 0.7067961165048544,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.2,
+   "make_conf": 0.5,
+   "val_score": 0.03203883495145632,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.031067961165048542,
+    "unknown": 0.017475728155339806,
+    "wrong": 0.229126213592233,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.170873786407767,
+    "unknown": 0.11262135922330097,
+    "wrong": 0.6737864077669903,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.2,
+   "make_conf": 0.6,
+   "val_score": 0.031067961165048563,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.02524271844660194,
+    "unknown": 0.02524271844660194,
+    "wrong": 0.22718446601941747,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.15728155339805824,
+    "unknown": 0.141747572815534,
+    "wrong": 0.658252427184466,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.2,
+   "make_conf": 0.7,
+   "val_score": 0.031067961165048508,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.03300970873786408,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.141747572815534,
+    "unknown": 0.17281553398058253,
+    "wrong": 0.6427184466019418,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.3,
+   "make_conf": 0.3,
+   "val_score": 0.042718446601941684,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.040776699029126215,
+    "unknown": 0.009708737864077669,
+    "wrong": 0.229126213592233,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.20970873786407768,
+    "unknown": 0.04854368932038835,
+    "wrong": 0.6990291262135923,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.3,
+   "make_conf": 0.4,
+   "val_score": 0.046601941747572845,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.036893203883495145,
+    "unknown": 0.015533980582524271,
+    "wrong": 0.22718446601941747,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.19611650485436893,
+    "unknown": 0.0854368932038835,
+    "wrong": 0.6757281553398058,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.3,
+   "make_conf": 0.5,
+   "val_score": 0.06310679611650485,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.03495145631067961,
+    "unknown": 0.02330097087378641,
+    "wrong": 0.22135922330097088,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.18640776699029127,
+    "unknown": 0.13398058252427184,
+    "wrong": 0.6368932038834951,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.3,
+   "make_conf": 0.6,
+   "val_score": 0.0621359223300971,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.02912621359223301,
+    "unknown": 0.031067961165048542,
+    "wrong": 0.21941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.16893203883495145,
+    "unknown": 0.170873786407767,
+    "wrong": 0.6174757281553398,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.3,
+   "make_conf": 0.7,
+   "val_score": 0.062135922330097126,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.02524271844660194,
+    "unknown": 0.038834951456310676,
+    "wrong": 0.21553398058252426,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.15145631067961166,
+    "unknown": 0.2058252427184466,
+    "wrong": 0.6,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.4,
+   "make_conf": 0.3,
+   "val_score": 0.09320388349514572,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.05436893203883495,
+    "unknown": 0.009708737864077669,
+    "wrong": 0.21941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.2563106796116505,
+    "unknown": 0.04854368932038835,
+    "wrong": 0.658252427184466,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.4,
+   "make_conf": 0.4,
+   "val_score": 0.10194174757281552,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.05048543689320388,
+    "unknown": 0.017475728155339806,
+    "wrong": 0.21553398058252426,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.2407766990291262,
+    "unknown": 0.0970873786407767,
+    "wrong": 0.625242718446602,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.4,
+   "make_conf": 0.5,
+   "val_score": 0.11941747572815534,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.04854368932038835,
+    "unknown": 0.027184466019417475,
+    "wrong": 0.20776699029126214,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.229126213592233,
+    "unknown": 0.14951456310679612,
+    "wrong": 0.5844660194174758,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.4,
+   "make_conf": 0.6,
+   "val_score": 0.11650485436893204,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.040776699029126215,
+    "unknown": 0.036893203883495145,
+    "wrong": 0.2058252427184466,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.20776699029126214,
+    "unknown": 0.19223300970873786,
+    "wrong": 0.5631067961165048,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.4,
+   "make_conf": 0.7,
+   "val_score": 0.11650485436893204,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.036893203883495145,
+    "unknown": 0.04660194174757282,
+    "wrong": 0.2,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.1883495145631068,
+    "unknown": 0.229126213592233,
+    "wrong": 0.545631067961165,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.5,
+   "make_conf": 0.3,
+   "val_score": 0.15922330097087384,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.08349514563106795,
+    "unknown": 0.009708737864077669,
+    "wrong": 0.20970873786407768,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.3145631067961165,
+    "unknown": 0.04854368932038835,
+    "wrong": 0.6019417475728155,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.5,
+   "make_conf": 0.4,
+   "val_score": 0.16796116504854375,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.07961165048543689,
+    "unknown": 0.017475728155339806,
+    "wrong": 0.2058252427184466,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.29902912621359223,
+    "unknown": 0.0970873786407767,
+    "wrong": 0.5689320388349515,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.5,
+   "make_conf": 0.5,
+   "val_score": 0.19029126213592235,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.07572815533980583,
+    "unknown": 0.03300970873786408,
+    "wrong": 0.1941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.2815533980582524,
+    "unknown": 0.16893203883495145,
+    "wrong": 0.5145631067961165,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.5,
+   "make_conf": 0.6,
+   "val_score": 0.18737864077669905,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.06601941747572816,
+    "unknown": 0.04466019417475728,
+    "wrong": 0.19223300970873786,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.258252427184466,
+    "unknown": 0.2174757281553398,
+    "wrong": 0.4893203883495146,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.5,
+   "make_conf": 0.7,
+   "val_score": 0.18349514563106797,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.06019417475728155,
+    "unknown": 0.05631067961165048,
+    "wrong": 0.18640776699029127,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.23300970873786409,
+    "unknown": 0.26019417475728157,
+    "wrong": 0.47184466019417476,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.6,
+   "make_conf": 0.3,
+   "val_score": 0.2097087378640777,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.1087378640776699,
+    "unknown": 0.009708737864077669,
+    "wrong": 0.2058252427184466,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.3650485436893204,
+    "unknown": 0.04854368932038835,
+    "wrong": 0.5553398058252427,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.6,
+   "make_conf": 0.4,
+   "val_score": 0.2184466019417476,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.10485436893203884,
+    "unknown": 0.017475728155339806,
+    "wrong": 0.20194174757281552,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.34951456310679613,
+    "unknown": 0.0970873786407767,
+    "wrong": 0.5223300970873787,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.6,
+   "make_conf": 0.5,
+   "val_score": 0.24077669902912624,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.10097087378640776,
+    "unknown": 0.03300970873786408,
+    "wrong": 0.19029126213592232,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.3320388349514563,
+    "unknown": 0.16893203883495145,
+    "wrong": 0.4679611650485437,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.6,
+   "make_conf": 0.6,
+   "val_score": 0.23980582524271846,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.08349514563106795,
+    "unknown": 0.05242718446601942,
+    "wrong": 0.1883495145631068,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.3067961165048544,
+    "unknown": 0.23300970873786409,
+    "wrong": 0.429126213592233,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.6,
+   "make_conf": 0.7,
+   "val_score": 0.2359223300970874,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.07572815533980583,
+    "unknown": 0.06601941747572816,
+    "wrong": 0.1825242718446602,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.2796116504854369,
+    "unknown": 0.2815533980582524,
+    "wrong": 0.4077669902912621,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.8,
+   "make_conf": 0.3,
+   "val_score": 0.28155339805825247,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.2,
+    "unknown": 0.009708737864077669,
+    "wrong": 0.1941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.4349514563106796,
+    "unknown": 0.04854368932038835,
+    "wrong": 0.49514563106796117,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.8,
+   "make_conf": 0.4,
+   "val_score": 0.2902912621359224,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.19611650485436893,
+    "unknown": 0.017475728155339806,
+    "wrong": 0.19029126213592232,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.41941747572815535,
+    "unknown": 0.0970873786407767,
+    "wrong": 0.4621359223300971,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.8,
+   "make_conf": 0.5,
+   "val_score": 0.312621359223301,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.19223300970873786,
+    "unknown": 0.03300970873786408,
+    "wrong": 0.1786407766990291,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.40194174757281553,
+    "unknown": 0.16893203883495145,
+    "wrong": 0.4077669902912621,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.8,
+   "make_conf": 0.6,
+   "val_score": 0.3116504854368932,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.17475728155339806,
+    "unknown": 0.05242718446601942,
+    "wrong": 0.1766990291262136,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.3766990291262136,
+    "unknown": 0.23300970873786409,
+    "wrong": 0.36893203883495146,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.0,
+   "name_conf": 0.8,
+   "make_conf": 0.7,
+   "val_score": 0.3116504854368932,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.15728155339805824,
+    "unknown": 0.07766990291262135,
+    "wrong": 0.16893203883495145,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.34563106796116505,
+    "unknown": 0.3048543689320388,
+    "wrong": 0.32815533980582523,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.1,
+   "make_conf": 0.3,
+   "val_score": 0.03203883495145632,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.03300970873786408,
+    "unknown": 0.013592233009708738,
+    "wrong": 0.23106796116504855,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.19805825242718447,
+    "unknown": 0.05825242718446602,
+    "wrong": 0.7009708737864078,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.1,
+   "make_conf": 0.4,
+   "val_score": 0.034951456310679585,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.02912621359223301,
+    "unknown": 0.019417475728155338,
+    "wrong": 0.229126213592233,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.18058252427184465,
+    "unknown": 0.10097087378640776,
+    "wrong": 0.6757281553398058,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.1,
+   "make_conf": 0.5,
+   "val_score": 0.03203883495145629,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.031067961165048542,
+    "wrong": 0.22524271844660193,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.15922330097087378,
+    "unknown": 0.141747572815534,
+    "wrong": 0.6563106796116505,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.1,
+   "make_conf": 0.6,
+   "val_score": 0.03203883495145629,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.019417475728155338,
+    "unknown": 0.03495145631067961,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.13980582524271845,
+    "unknown": 0.18058252427184465,
+    "wrong": 0.6368932038834951,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.1,
+   "make_conf": 0.7,
+   "val_score": 0.020388349514563087,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.04660194174757282,
+    "wrong": 0.21941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.1087378640776699,
+    "unknown": 0.22330097087378642,
+    "wrong": 0.625242718446602,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.2,
+   "make_conf": 0.3,
+   "val_score": 0.033009708737864074,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.03300970873786408,
+    "unknown": 0.013592233009708738,
+    "wrong": 0.23106796116504855,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.19805825242718447,
+    "unknown": 0.06019417475728155,
+    "wrong": 0.6990291262135923,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.2,
+   "make_conf": 0.4,
+   "val_score": 0.03786407766990285,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.02912621359223301,
+    "unknown": 0.019417475728155338,
+    "wrong": 0.229126213592233,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.18058252427184465,
+    "unknown": 0.10679611650485436,
+    "wrong": 0.6699029126213593,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.2,
+   "make_conf": 0.5,
+   "val_score": 0.03495145631067956,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.031067961165048542,
+    "wrong": 0.22524271844660193,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.15922330097087378,
+    "unknown": 0.14757281553398058,
+    "wrong": 0.6504854368932039,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.2,
+   "make_conf": 0.6,
+   "val_score": 0.03592233009708737,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.019417475728155338,
+    "unknown": 0.03495145631067961,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.13980582524271845,
+    "unknown": 0.1883495145631068,
+    "wrong": 0.629126213592233,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.2,
+   "make_conf": 0.7,
+   "val_score": 0.024271844660194164,
+   "val_catalogued": {
+    "correct_name": 0.7223300970873786,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.04660194174757282,
+    "wrong": 0.21941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.1087378640776699,
+    "unknown": 0.23106796116504855,
+    "wrong": 0.6174757281553398,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.3,
+   "make_conf": 0.3,
+   "val_score": 0.05631067961165051,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.036893203883495145,
+    "unknown": 0.015533980582524271,
+    "wrong": 0.22718446601941747,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.21359223300970873,
+    "unknown": 0.06990291262135923,
+    "wrong": 0.6737864077669903,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.3,
+   "make_conf": 0.4,
+   "val_score": 0.06601941747572818,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.03300970873786408,
+    "unknown": 0.02330097087378641,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.19611650485436893,
+    "unknown": 0.12427184466019417,
+    "wrong": 0.6368932038834951,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.3,
+   "make_conf": 0.5,
+   "val_score": 0.06310679611650488,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.02524271844660194,
+    "unknown": 0.03495145631067961,
+    "wrong": 0.21941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.170873786407767,
+    "unknown": 0.17281553398058253,
+    "wrong": 0.6135922330097088,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.3,
+   "make_conf": 0.6,
+   "val_score": 0.06504854368932037,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.040776699029126215,
+    "wrong": 0.21553398058252426,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.14951456310679612,
+    "unknown": 0.2174757281553398,
+    "wrong": 0.5902912621359223,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.3,
+   "make_conf": 0.7,
+   "val_score": 0.052427184466019405,
+   "val_catalogued": {
+    "correct_name": 0.7203883495145631,
+    "correct_make": 0.015533980582524271,
+    "unknown": 0.05242718446601942,
+    "wrong": 0.21165048543689322,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.11650485436893204,
+    "unknown": 0.2621359223300971,
+    "wrong": 0.5786407766990291,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.4,
+   "make_conf": 0.3,
+   "val_score": 0.10873786407766992,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.05048543689320388,
+    "unknown": 0.015533980582524271,
+    "wrong": 0.2174757281553398,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.258252427184466,
+    "unknown": 0.07766990291262135,
+    "wrong": 0.6271844660194175,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.4,
+   "make_conf": 0.4,
+   "val_score": 0.12135922330097085,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.04660194174757282,
+    "unknown": 0.027184466019417475,
+    "wrong": 0.20970873786407768,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.23883495145631067,
+    "unknown": 0.1378640776699029,
+    "wrong": 0.5864077669902913,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.4,
+   "make_conf": 0.5,
+   "val_score": 0.11844660194174761,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.036893203883495145,
+    "unknown": 0.04271844660194175,
+    "wrong": 0.20388349514563106,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.21165048543689322,
+    "unknown": 0.19029126213592232,
+    "wrong": 0.5611650485436893,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.4,
+   "make_conf": 0.6,
+   "val_score": 0.11747572815533985,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.03300970873786408,
+    "unknown": 0.05048543689320388,
+    "wrong": 0.2,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.18446601941747573,
+    "unknown": 0.24271844660194175,
+    "wrong": 0.5359223300970873,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.4,
+   "make_conf": 0.7,
+   "val_score": 0.10194174757281557,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.02524271844660194,
+    "unknown": 0.062135922330097085,
+    "wrong": 0.19611650485436893,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.14563106796116504,
+    "unknown": 0.29320388349514565,
+    "wrong": 0.5242718446601942,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.5,
+   "make_conf": 0.3,
+   "val_score": 0.17475728155339815,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.07961165048543689,
+    "unknown": 0.015533980582524271,
+    "wrong": 0.20776699029126214,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.31650485436893205,
+    "unknown": 0.07766990291262135,
+    "wrong": 0.570873786407767,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.5,
+   "make_conf": 0.4,
+   "val_score": 0.1922330097087379,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.07378640776699029,
+    "unknown": 0.031067961165048542,
+    "wrong": 0.19805825242718447,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.29320388349514565,
+    "unknown": 0.1553398058252427,
+    "wrong": 0.516504854368932,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.5,
+   "make_conf": 0.5,
+   "val_score": 0.18932038834951462,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.06407766990291262,
+    "unknown": 0.04854368932038835,
+    "wrong": 0.19029126213592232,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.2621359223300971,
+    "unknown": 0.21359223300970873,
+    "wrong": 0.4893203883495146,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.5,
+   "make_conf": 0.6,
+   "val_score": 0.1854368932038835,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.05631067961165048,
+    "unknown": 0.06019417475728155,
+    "wrong": 0.18640776699029127,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.22718446601941747,
+    "unknown": 0.2796116504854369,
+    "wrong": 0.458252427184466,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.5,
+   "make_conf": 0.7,
+   "val_score": 0.16504854368932043,
+   "val_catalogued": {
+    "correct_name": 0.6970873786407767,
+    "correct_make": 0.04466019417475728,
+    "unknown": 0.07766990291262135,
+    "wrong": 0.18058252427184465,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.18058252427184465,
+    "unknown": 0.3378640776699029,
+    "wrong": 0.44660194174757284,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.6,
+   "make_conf": 0.3,
+   "val_score": 0.22524271844660193,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.10485436893203884,
+    "unknown": 0.015533980582524271,
+    "wrong": 0.20388349514563106,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.36699029126213595,
+    "unknown": 0.07766990291262135,
+    "wrong": 0.5242718446601942,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.6,
+   "make_conf": 0.4,
+   "val_score": 0.24271844660194175,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.09902912621359224,
+    "unknown": 0.031067961165048542,
+    "wrong": 0.1941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.34368932038834954,
+    "unknown": 0.1553398058252427,
+    "wrong": 0.46990291262135925,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.6,
+   "make_conf": 0.5,
+   "val_score": 0.241747572815534,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.07961165048543689,
+    "unknown": 0.05825242718446602,
+    "wrong": 0.18640776699029127,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.3106796116504854,
+    "unknown": 0.23106796116504855,
+    "wrong": 0.42718446601941745,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.6,
+   "make_conf": 0.6,
+   "val_score": 0.23592233009708738,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.06990291262135923,
+    "unknown": 0.07184466019417475,
+    "wrong": 0.1825242718446602,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.27184466019417475,
+    "unknown": 0.3029126213592233,
+    "wrong": 0.3941747572815534,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.6,
+   "make_conf": 0.7,
+   "val_score": 0.21553398058252426,
+   "val_catalogued": {
+    "correct_name": 0.6757281553398058,
+    "correct_make": 0.05825242718446602,
+    "unknown": 0.08932038834951456,
+    "wrong": 0.1766990291262136,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.22330097087378642,
+    "unknown": 0.3650485436893204,
+    "wrong": 0.38058252427184464,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.8,
+   "make_conf": 0.3,
+   "val_score": 0.2970873786407767,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.19611650485436893,
+    "unknown": 0.015533980582524271,
+    "wrong": 0.19223300970873786,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.4368932038834951,
+    "unknown": 0.07766990291262135,
+    "wrong": 0.4640776699029126,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.8,
+   "make_conf": 0.4,
+   "val_score": 0.31456310679611654,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.19029126213592232,
+    "unknown": 0.031067961165048542,
+    "wrong": 0.1825242718446602,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.41359223300970877,
+    "unknown": 0.1553398058252427,
+    "wrong": 0.4097087378640777,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.8,
+   "make_conf": 0.5,
+   "val_score": 0.31456310679611654,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.1650485436893204,
+    "unknown": 0.06407766990291262,
+    "wrong": 0.17475728155339806,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.3786407766990291,
+    "unknown": 0.24271844660194175,
+    "wrong": 0.3572815533980582,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.8,
+   "make_conf": 0.6,
+   "val_score": 0.31456310679611654,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.14757281553398058,
+    "unknown": 0.08932038834951456,
+    "wrong": 0.1669902912621359,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.3359223300970874,
+    "unknown": 0.3378640776699029,
+    "wrong": 0.3048543689320388,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.25,
+   "name_conf": 0.8,
+   "make_conf": 0.7,
+   "val_score": 0.28640776699029136,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.1262135922330097,
+    "unknown": 0.11650485436893204,
+    "wrong": 0.16116504854368932,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.2757281553398058,
+    "unknown": 0.4174757281553398,
+    "wrong": 0.2854368932038835,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.1,
+   "make_conf": 0.3,
+   "val_score": 0.05048543689320392,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.027184466019417475,
+    "unknown": 0.017475728155339806,
+    "wrong": 0.23689320388349513,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.2058252427184466,
+    "unknown": 0.09514563106796116,
+    "wrong": 0.6563106796116505,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.1,
+   "make_conf": 0.4,
+   "val_score": 0.04951456310679608,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.019417475728155338,
+    "unknown": 0.038834951456310676,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.1669902912621359,
+    "unknown": 0.1650485436893204,
+    "wrong": 0.625242718446602,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.1,
+   "make_conf": 0.5,
+   "val_score": 0.04174757281553401,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.05242718446601942,
+    "wrong": 0.2174757281553398,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.13009708737864079,
+    "unknown": 0.22524271844660193,
+    "wrong": 0.6019417475728155,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.1,
+   "make_conf": 0.6,
+   "val_score": 0.023300970873786464,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.007766990291262136,
+    "unknown": 0.05631067961165048,
+    "wrong": 0.2174757281553398,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.08737864077669903,
+    "unknown": 0.27766990291262134,
+    "wrong": 0.5922330097087378,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.1,
+   "make_conf": 0.7,
+   "val_score": 0.004854368932038805,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.06601941747572816,
+    "wrong": 0.21359223300970873,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.04660194174757282,
+    "unknown": 0.32427184466019415,
+    "wrong": 0.5864077669902913,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.2,
+   "make_conf": 0.3,
+   "val_score": 0.05242718446601943,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.027184466019417475,
+    "unknown": 0.017475728155339806,
+    "wrong": 0.23689320388349513,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.2058252427184466,
+    "unknown": 0.09902912621359224,
+    "wrong": 0.6524271844660194,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.2,
+   "make_conf": 0.4,
+   "val_score": 0.052427184466019405,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.019417475728155338,
+    "unknown": 0.038834951456310676,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.1669902912621359,
+    "unknown": 0.170873786407767,
+    "wrong": 0.6194174757281553,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.2,
+   "make_conf": 0.5,
+   "val_score": 0.04466019417475728,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.05242718446601942,
+    "wrong": 0.2174757281553398,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.13009708737864079,
+    "unknown": 0.23106796116504855,
+    "wrong": 0.596116504854369,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.2,
+   "make_conf": 0.6,
+   "val_score": 0.02621359223300973,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.007766990291262136,
+    "unknown": 0.05631067961165048,
+    "wrong": 0.2174757281553398,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.08737864077669903,
+    "unknown": 0.283495145631068,
+    "wrong": 0.5864077669902913,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.2,
+   "make_conf": 0.7,
+   "val_score": 0.007766990291262127,
+   "val_catalogued": {
+    "correct_name": 0.7184466019417476,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.06601941747572816,
+    "wrong": 0.21359223300970873,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.04660194174757282,
+    "unknown": 0.3300970873786408,
+    "wrong": 0.5805825242718446,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.3,
+   "make_conf": 0.3,
+   "val_score": 0.07281553398058255,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.031067961165048542,
+    "unknown": 0.017475728155339806,
+    "wrong": 0.23495145631067962,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.21941747572815534,
+    "unknown": 0.1087378640776699,
+    "wrong": 0.629126213592233,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.3,
+   "make_conf": 0.4,
+   "val_score": 0.07281553398058246,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.038834951456310676,
+    "wrong": 0.22135922330097088,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.1786407766990291,
+    "unknown": 0.18446601941747573,
+    "wrong": 0.5941747572815534,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.3,
+   "make_conf": 0.5,
+   "val_score": 0.06407766990291267,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.015533980582524271,
+    "unknown": 0.05242718446601942,
+    "wrong": 0.21553398058252426,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.13980582524271845,
+    "unknown": 0.24660194174757283,
+    "wrong": 0.570873786407767,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.3,
+   "make_conf": 0.6,
+   "val_score": 0.044660194174757306,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.007766990291262136,
+    "unknown": 0.062135922330097085,
+    "wrong": 0.21359223300970873,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.09514563106796116,
+    "unknown": 0.3029126213592233,
+    "wrong": 0.5592233009708738,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.3,
+   "make_conf": 0.7,
+   "val_score": 0.024271844660194164,
+   "val_catalogued": {
+    "correct_name": 0.7165048543689321,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.07184466019417475,
+    "wrong": 0.20970873786407768,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.04271844660194175,
+    "correct_make": 0.05048543689320388,
+    "unknown": 0.3533980582524272,
+    "wrong": 0.5533980582524272,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.4,
+   "make_conf": 0.3,
+   "val_score": 0.12330097087378639,
+   "val_catalogued": {
+    "correct_name": 0.7126213592233009,
+    "correct_make": 0.04271844660194175,
+    "unknown": 0.021359223300970873,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.2621359223300971,
+    "unknown": 0.11650485436893204,
+    "wrong": 0.5844660194174758,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.4,
+   "make_conf": 0.4,
+   "val_score": 0.12621359223300974,
+   "val_catalogued": {
+    "correct_name": 0.7126213592233009,
+    "correct_make": 0.03300970873786408,
+    "unknown": 0.04854368932038835,
+    "wrong": 0.2058252427184466,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.21941747572815534,
+    "unknown": 0.2,
+    "wrong": 0.5436893203883495,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.4,
+   "make_conf": 0.5,
+   "val_score": 0.11359223300970878,
+   "val_catalogued": {
+    "correct_name": 0.7126213592233009,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.06407766990291262,
+    "wrong": 0.2,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.17475728155339806,
+    "unknown": 0.26796116504854367,
+    "wrong": 0.5203883495145631,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.4,
+   "make_conf": 0.6,
+   "val_score": 0.08446601941747578,
+   "val_catalogued": {
+    "correct_name": 0.7126213592233009,
+    "correct_make": 0.015533980582524271,
+    "unknown": 0.07378640776699029,
+    "wrong": 0.19805825242718447,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.11067961165048544,
+    "unknown": 0.34368932038834954,
+    "wrong": 0.5087378640776699,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.4,
+   "make_conf": 0.7,
+   "val_score": 0.05922330097087375,
+   "val_catalogued": {
+    "correct_name": 0.7126213592233009,
+    "correct_make": 0.007766990291262136,
+    "unknown": 0.0854368932038835,
+    "wrong": 0.1941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.036893203883495145,
+    "correct_make": 0.05825242718446602,
+    "unknown": 0.40194174757281553,
+    "wrong": 0.5029126213592233,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.5,
+   "make_conf": 0.3,
+   "val_score": 0.19223300970873786,
+   "val_catalogued": {
+    "correct_name": 0.6932038834951456,
+    "correct_make": 0.06990291262135923,
+    "unknown": 0.02524271844660194,
+    "wrong": 0.21165048543689322,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.31650485436893205,
+    "unknown": 0.13009708737864079,
+    "wrong": 0.5184466019417475,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.5,
+   "make_conf": 0.4,
+   "val_score": 0.19223300970873783,
+   "val_catalogued": {
+    "correct_name": 0.6932038834951456,
+    "correct_make": 0.05825242718446602,
+    "unknown": 0.05436893203883495,
+    "wrong": 0.1941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.26601941747572816,
+    "unknown": 0.22524271844660193,
+    "wrong": 0.47378640776699027,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.5,
+   "make_conf": 0.5,
+   "val_score": 0.17281553398058247,
+   "val_catalogued": {
+    "correct_name": 0.6932038834951456,
+    "correct_make": 0.040776699029126215,
+    "unknown": 0.08155339805825243,
+    "wrong": 0.18446601941747573,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.20970873786407768,
+    "unknown": 0.3067961165048544,
+    "wrong": 0.44854368932038835,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.5,
+   "make_conf": 0.6,
+   "val_score": 0.13786407766990288,
+   "val_catalogued": {
+    "correct_name": 0.6932038834951456,
+    "correct_make": 0.031067961165048542,
+    "unknown": 0.09320388349514563,
+    "wrong": 0.1825242718446602,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.13592233009708737,
+    "unknown": 0.39223300970873787,
+    "wrong": 0.4368932038834951,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.5,
+   "make_conf": 0.7,
+   "val_score": 0.10679611650485438,
+   "val_catalogued": {
+    "correct_name": 0.6932038834951456,
+    "correct_make": 0.019417475728155338,
+    "unknown": 0.1087378640776699,
+    "wrong": 0.1786407766990291,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.07572815533980583,
+    "unknown": 0.458252427184466,
+    "wrong": 0.43106796116504853,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.6,
+   "make_conf": 0.3,
+   "val_score": 0.24368932038834953,
+   "val_catalogued": {
+    "correct_name": 0.6737864077669903,
+    "correct_make": 0.09320388349514563,
+    "unknown": 0.02524271844660194,
+    "wrong": 0.20776699029126214,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.3650485436893204,
+    "unknown": 0.13592233009708737,
+    "wrong": 0.4679611650485437,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.6,
+   "make_conf": 0.4,
+   "val_score": 0.2446601941747573,
+   "val_catalogued": {
+    "correct_name": 0.6737864077669903,
+    "correct_make": 0.07378640776699029,
+    "unknown": 0.062135922330097085,
+    "wrong": 0.19029126213592232,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.3145631067961165,
+    "unknown": 0.2407766990291262,
+    "wrong": 0.41359223300970877,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.6,
+   "make_conf": 0.5,
+   "val_score": 0.21359223300970878,
+   "val_catalogued": {
+    "correct_name": 0.6737864077669903,
+    "correct_make": 0.05242718446601942,
+    "unknown": 0.09320388349514563,
+    "wrong": 0.18058252427184465,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.23883495145631067,
+    "unknown": 0.341747572815534,
+    "wrong": 0.3883495145631068,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.6,
+   "make_conf": 0.6,
+   "val_score": 0.17087378640776701,
+   "val_catalogued": {
+    "correct_name": 0.6737864077669903,
+    "correct_make": 0.03495145631067961,
+    "unknown": 0.11262135922330097,
+    "wrong": 0.1786407766990291,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.1553398058252427,
+    "unknown": 0.4388349514563107,
+    "wrong": 0.37475728155339805,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.6,
+   "make_conf": 0.7,
+   "val_score": 0.1368932038834951,
+   "val_catalogued": {
+    "correct_name": 0.6737864077669903,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.13009708737864079,
+    "wrong": 0.17475728155339806,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.031067961165048542,
+    "correct_make": 0.0912621359223301,
+    "unknown": 0.5087378640776699,
+    "wrong": 0.36893203883495146,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.8,
+   "make_conf": 0.3,
+   "val_score": 0.31553398058252424,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.1825242718446602,
+    "unknown": 0.02524271844660194,
+    "wrong": 0.19611650485436893,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.4349514563106796,
+    "unknown": 0.13592233009708737,
+    "wrong": 0.4077669902912621,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.8,
+   "make_conf": 0.4,
+   "val_score": 0.32233009708737864,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.15145631067961166,
+    "unknown": 0.07766990291262135,
+    "wrong": 0.17475728155339806,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.3786407766990291,
+    "unknown": 0.27184466019417475,
+    "wrong": 0.32815533980582523,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.8,
+   "make_conf": 0.5,
+   "val_score": 0.270873786407767,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.10485436893203884,
+    "unknown": 0.13398058252427184,
+    "wrong": 0.1650485436893204,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.2796116504854369,
+    "unknown": 0.40388349514563104,
+    "wrong": 0.29514563106796116,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.8,
+   "make_conf": 0.6,
+   "val_score": 0.21456310679611654,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.07378640776699029,
+    "unknown": 0.1669902912621359,
+    "wrong": 0.16310679611650486,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.18058252427184465,
+    "unknown": 0.5184466019417475,
+    "wrong": 0.2796116504854369,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.5,
+   "name_conf": 0.8,
+   "make_conf": 0.7,
+   "val_score": 0.16796116504854366,
+   "val_catalogued": {
+    "correct_name": 0.596116504854369,
+    "correct_make": 0.05048543689320388,
+    "unknown": 0.1941747572815534,
+    "wrong": 0.15922330097087378,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.10097087378640776,
+    "unknown": 0.6038834951456311,
+    "wrong": 0.2737864077669903,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.1,
+   "make_conf": 0.3,
+   "val_score": -0.007766990291262127,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.05631067961165048,
+    "wrong": 0.2912621359223301,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.1883495145631068,
+    "unknown": 0.1650485436893204,
+    "wrong": 0.6058252427184466,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.1,
+   "make_conf": 0.4,
+   "val_score": 0.006796116504854399,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.009708737864077669,
+    "unknown": 0.10485436893203884,
+    "wrong": 0.2446601941747573,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.1262135922330097,
+    "unknown": 0.2737864077669903,
+    "wrong": 0.5592233009708738,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.1,
+   "make_conf": 0.5,
+   "val_score": 0.002912621359223322,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.005825242718446602,
+    "unknown": 0.13009708737864079,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.07378640776699029,
+    "unknown": 0.3533980582524272,
+    "wrong": 0.5320388349514563,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.1,
+   "make_conf": 0.6,
+   "val_score": -0.002912621359223294,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.14757281553398058,
+    "wrong": 0.20970873786407768,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.036893203883495145,
+    "unknown": 0.4058252427184466,
+    "wrong": 0.516504854368932,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.1,
+   "make_conf": 0.7,
+   "val_score": -0.011650485436893177,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.0,
+    "unknown": 0.1533980582524272,
+    "wrong": 0.2058252427184466,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.007766990291262136,
+    "unknown": 0.4446601941747573,
+    "wrong": 0.5067961165048543,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.2,
+   "make_conf": 0.3,
+   "val_score": -0.0067961165048543715,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.05631067961165048,
+    "wrong": 0.2912621359223301,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.1883495145631068,
+    "unknown": 0.1669902912621359,
+    "wrong": 0.6038834951456311,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.2,
+   "make_conf": 0.4,
+   "val_score": 0.007766990291262155,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.009708737864077669,
+    "unknown": 0.10485436893203884,
+    "wrong": 0.2446601941747573,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.1262135922330097,
+    "unknown": 0.2757281553398058,
+    "wrong": 0.5572815533980583,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.2,
+   "make_conf": 0.5,
+   "val_score": 0.0038834951456310773,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.005825242718446602,
+    "unknown": 0.13009708737864079,
+    "wrong": 0.22330097087378642,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.07378640776699029,
+    "unknown": 0.3553398058252427,
+    "wrong": 0.5300970873786408,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.2,
+   "make_conf": 0.6,
+   "val_score": -0.0019417475728155387,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.14757281553398058,
+    "wrong": 0.20970873786407768,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.036893203883495145,
+    "unknown": 0.4077669902912621,
+    "wrong": 0.5145631067961165,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.2,
+   "make_conf": 0.7,
+   "val_score": -0.010679611650485421,
+   "val_catalogued": {
+    "correct_name": 0.6407766990291263,
+    "correct_make": 0.0,
+    "unknown": 0.1533980582524272,
+    "wrong": 0.2058252427184466,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.007766990291262136,
+    "unknown": 0.44660194174757284,
+    "wrong": 0.5048543689320388,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.3,
+   "make_conf": 0.3,
+   "val_score": 0.00873786407766991,
+   "val_catalogued": {
+    "correct_name": 0.6388349514563106,
+    "correct_make": 0.015533980582524271,
+    "unknown": 0.05631067961165048,
+    "wrong": 0.28932038834951457,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.2,
+    "unknown": 0.170873786407767,
+    "wrong": 0.5883495145631068,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.3,
+   "make_conf": 0.4,
+   "val_score": 0.021359223300970842,
+   "val_catalogued": {
+    "correct_name": 0.6388349514563106,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.10679611650485436,
+    "wrong": 0.24271844660194175,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.13592233009708737,
+    "unknown": 0.2815533980582524,
+    "wrong": 0.541747572815534,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.3,
+   "make_conf": 0.5,
+   "val_score": 0.013592233009708715,
+   "val_catalogued": {
+    "correct_name": 0.6388349514563106,
+    "correct_make": 0.005825242718446602,
+    "unknown": 0.13398058252427184,
+    "wrong": 0.22135922330097088,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.07766990291262135,
+    "unknown": 0.36699029126213595,
+    "wrong": 0.5145631067961165,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.3,
+   "make_conf": 0.6,
+   "val_score": 0.009708737864077666,
+   "val_catalogued": {
+    "correct_name": 0.6388349514563106,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.1533980582524272,
+    "wrong": 0.2058252427184466,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.040776699029126215,
+    "unknown": 0.42135922330097086,
+    "wrong": 0.4970873786407767,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.3,
+   "make_conf": 0.7,
+   "val_score": 0.0,
+   "val_catalogued": {
+    "correct_name": 0.6388349514563106,
+    "correct_make": 0.0,
+    "unknown": 0.15922330097087378,
+    "wrong": 0.20194174757281552,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.040776699029126215,
+    "correct_make": 0.009708737864077669,
+    "unknown": 0.4621359223300971,
+    "wrong": 0.487378640776699,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.4,
+   "make_conf": 0.3,
+   "val_score": 0.054368932038835,
+   "val_catalogued": {
+    "correct_name": 0.6349514563106796,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.06601941747572816,
+    "wrong": 0.2757281553398058,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.23689320388349513,
+    "unknown": 0.1825242718446602,
+    "wrong": 0.545631067961165,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.4,
+   "make_conf": 0.4,
+   "val_score": 0.05825242718446602,
+   "val_catalogued": {
+    "correct_name": 0.6349514563106796,
+    "correct_make": 0.019417475728155338,
+    "unknown": 0.11650485436893204,
+    "wrong": 0.229126213592233,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.1553398058252427,
+    "unknown": 0.3106796116504854,
+    "wrong": 0.49902912621359224,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.4,
+   "make_conf": 0.5,
+   "val_score": 0.048543689320388356,
+   "val_catalogued": {
+    "correct_name": 0.6349514563106796,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.14563106796116504,
+    "wrong": 0.20776699029126214,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.09514563106796116,
+    "unknown": 0.39805825242718446,
+    "wrong": 0.47184466019417476,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.4,
+   "make_conf": 0.6,
+   "val_score": 0.03883495145631069,
+   "val_catalogued": {
+    "correct_name": 0.6349514563106796,
+    "correct_make": 0.007766990291262136,
+    "unknown": 0.1650485436893204,
+    "wrong": 0.19223300970873786,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.04660194174757282,
+    "unknown": 0.4640776699029126,
+    "wrong": 0.45436893203883494,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.4,
+   "make_conf": 0.7,
+   "val_score": 0.026213592233009703,
+   "val_catalogued": {
+    "correct_name": 0.6349514563106796,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.17475728155339806,
+    "wrong": 0.1883495145631068,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03495145631067961,
+    "correct_make": 0.013592233009708738,
+    "unknown": 0.5067961165048543,
+    "wrong": 0.4446601941747573,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.5,
+   "make_conf": 0.3,
+   "val_score": 0.10970873786407762,
+   "val_catalogued": {
+    "correct_name": 0.6174757281553398,
+    "correct_make": 0.040776699029126215,
+    "unknown": 0.07766990291262135,
+    "wrong": 0.26407766990291265,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03300970873786408,
+    "correct_make": 0.27766990291262134,
+    "unknown": 0.20388349514563106,
+    "wrong": 0.4854368932038835,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.5,
+   "make_conf": 0.4,
+   "val_score": 0.10873786407766992,
+   "val_catalogued": {
+    "correct_name": 0.6174757281553398,
+    "correct_make": 0.03495145631067961,
+    "unknown": 0.13203883495145632,
+    "wrong": 0.21553398058252426,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03300970873786408,
+    "correct_make": 0.18640776699029127,
+    "unknown": 0.341747572815534,
+    "wrong": 0.4388349514563107,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.5,
+   "make_conf": 0.5,
+   "val_score": 0.09611650485436896,
+   "val_catalogued": {
+    "correct_name": 0.6174757281553398,
+    "correct_make": 0.02524271844660194,
+    "unknown": 0.1650485436893204,
+    "wrong": 0.19223300970873786,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03300970873786408,
+    "correct_make": 0.1203883495145631,
+    "unknown": 0.4349514563106796,
+    "wrong": 0.4116504854368932,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.5,
+   "make_conf": 0.6,
+   "val_score": 0.08252427184466019,
+   "val_catalogued": {
+    "correct_name": 0.6174757281553398,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.18446601941747573,
+    "wrong": 0.1766990291262136,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03300970873786408,
+    "correct_make": 0.06407766990291262,
+    "unknown": 0.5087378640776699,
+    "wrong": 0.3941747572815534,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.5,
+   "make_conf": 0.7,
+   "val_score": 0.06310679611650485,
+   "val_catalogued": {
+    "correct_name": 0.6174757281553398,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.19805825242718447,
+    "wrong": 0.17281553398058253,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.03300970873786408,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.5611650485436893,
+    "wrong": 0.3844660194174757,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.6,
+   "make_conf": 0.3,
+   "val_score": 0.14660194174757277,
+   "val_catalogued": {
+    "correct_name": 0.6077669902912621,
+    "correct_make": 0.05048543689320388,
+    "unknown": 0.08155339805825243,
+    "wrong": 0.26019417475728157,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.02912621359223301,
+    "correct_make": 0.3048543689320388,
+    "unknown": 0.22718446601941747,
+    "wrong": 0.4388349514563107,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.6,
+   "make_conf": 0.4,
+   "val_score": 0.1398058252427184,
+   "val_catalogued": {
+    "correct_name": 0.6077669902912621,
+    "correct_make": 0.038834951456310676,
+    "unknown": 0.141747572815534,
+    "wrong": 0.21165048543689322,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.02912621359223301,
+    "correct_make": 0.2058252427184466,
+    "unknown": 0.37475728155339805,
+    "wrong": 0.39029126213592236,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.6,
+   "make_conf": 0.5,
+   "val_score": 0.12427184466019417,
+   "val_catalogued": {
+    "correct_name": 0.6077669902912621,
+    "correct_make": 0.027184466019417475,
+    "unknown": 0.1766990291262136,
+    "wrong": 0.1883495145631068,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.02912621359223301,
+    "correct_make": 0.13592233009708737,
+    "unknown": 0.47184466019417476,
+    "wrong": 0.36310679611650487,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.6,
+   "make_conf": 0.6,
+   "val_score": 0.10970873786407764,
+   "val_catalogued": {
+    "correct_name": 0.6077669902912621,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.19611650485436893,
+    "wrong": 0.17281553398058253,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.02912621359223301,
+    "correct_make": 0.07766990291262135,
+    "unknown": 0.5475728155339806,
+    "wrong": 0.34563106796116505,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.6,
+   "make_conf": 0.7,
+   "val_score": 0.08737864077669899,
+   "val_catalogued": {
+    "correct_name": 0.6077669902912621,
+    "correct_make": 0.013592233009708738,
+    "unknown": 0.20970873786407768,
+    "wrong": 0.16893203883495145,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.02912621359223301,
+    "correct_make": 0.02912621359223301,
+    "unknown": 0.6058252427184466,
+    "wrong": 0.3359223300970874,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.8,
+   "make_conf": 0.3,
+   "val_score": 0.19611650485436893,
+   "val_catalogued": {
+    "correct_name": 0.541747572815534,
+    "correct_make": 0.09514563106796116,
+    "unknown": 0.1145631067961165,
+    "wrong": 0.24854368932038834,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.34563106796116505,
+    "unknown": 0.26990291262135924,
+    "wrong": 0.36310679611650487,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.8,
+   "make_conf": 0.4,
+   "val_score": 0.1796116504854369,
+   "val_catalogued": {
+    "correct_name": 0.541747572815534,
+    "correct_make": 0.07766990291262135,
+    "unknown": 0.18058252427184465,
+    "wrong": 0.2,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.23300970873786409,
+    "unknown": 0.43106796116504853,
+    "wrong": 0.3145631067961165,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.8,
+   "make_conf": 0.5,
+   "val_score": 0.15825242718446603,
+   "val_catalogued": {
+    "correct_name": 0.541747572815534,
+    "correct_make": 0.062135922330097085,
+    "unknown": 0.21941747572815534,
+    "wrong": 0.1766990291262136,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.1533980582524272,
+    "unknown": 0.5398058252427185,
+    "wrong": 0.2854368932038835,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.8,
+   "make_conf": 0.6,
+   "val_score": 0.13398058252427186,
+   "val_catalogued": {
+    "correct_name": 0.541747572815534,
+    "correct_make": 0.04854368932038835,
+    "unknown": 0.24854368932038834,
+    "wrong": 0.16116504854368932,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.0854368932038835,
+    "unknown": 0.625242718446602,
+    "wrong": 0.26796116504854367,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 0.75,
+   "name_conf": 0.8,
+   "make_conf": 0.7,
+   "val_score": 0.10291262135922333,
+   "val_catalogued": {
+    "correct_name": 0.541747572815534,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.27766990291262134,
+    "wrong": 0.15728155339805824,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.021359223300970873,
+    "correct_make": 0.03495145631067961,
+    "unknown": 0.6854368932038835,
+    "wrong": 0.258252427184466,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.1,
+   "make_conf": 0.3,
+   "val_score": -0.12718446601941746,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.013592233009708738,
+    "unknown": 0.26990291262135924,
+    "wrong": 0.32233009708737864,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.13980582524271845,
+    "unknown": 0.34951456310679613,
+    "wrong": 0.49514563106796117,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.1,
+   "make_conf": 0.4,
+   "val_score": -0.09708737864077671,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.341747572815534,
+    "wrong": 0.2621359223300971,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.0912621359223301,
+    "unknown": 0.458252427184466,
+    "wrong": 0.4349514563106796,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.1,
+   "make_conf": 0.5,
+   "val_score": -0.07864077669902915,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.3825242718446602,
+    "wrong": 0.22135922330097088,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.04660194174757282,
+    "unknown": 0.5436893203883495,
+    "wrong": 0.3941747572815534,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.1,
+   "make_conf": 0.6,
+   "val_score": -0.0650485436893204,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.0,
+    "unknown": 0.4116504854368932,
+    "wrong": 0.1941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.596116504854369,
+    "wrong": 0.36699029126213595,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.1,
+   "make_conf": 0.7,
+   "val_score": -0.060194174757281574,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.0,
+    "unknown": 0.42524271844660194,
+    "wrong": 0.18058252427184465,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.003883495145631068,
+    "unknown": 0.6271844660194175,
+    "wrong": 0.3533980582524272,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.2,
+   "make_conf": 0.3,
+   "val_score": -0.12718446601941746,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.013592233009708738,
+    "unknown": 0.26990291262135924,
+    "wrong": 0.32233009708737864,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.13980582524271845,
+    "unknown": 0.34951456310679613,
+    "wrong": 0.49514563106796117,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.2,
+   "make_conf": 0.4,
+   "val_score": -0.09708737864077671,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.341747572815534,
+    "wrong": 0.2621359223300971,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.0912621359223301,
+    "unknown": 0.458252427184466,
+    "wrong": 0.4349514563106796,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.2,
+   "make_conf": 0.5,
+   "val_score": -0.07864077669902915,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.3825242718446602,
+    "wrong": 0.22135922330097088,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.04660194174757282,
+    "unknown": 0.5436893203883495,
+    "wrong": 0.3941747572815534,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.2,
+   "make_conf": 0.6,
+   "val_score": -0.0650485436893204,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.0,
+    "unknown": 0.4116504854368932,
+    "wrong": 0.1941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.596116504854369,
+    "wrong": 0.36699029126213595,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.2,
+   "make_conf": 0.7,
+   "val_score": -0.060194174757281574,
+   "val_catalogued": {
+    "correct_name": 0.3941747572815534,
+    "correct_make": 0.0,
+    "unknown": 0.42524271844660194,
+    "wrong": 0.18058252427184465,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.003883495145631068,
+    "unknown": 0.6271844660194175,
+    "wrong": 0.3533980582524272,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.3,
+   "make_conf": 0.3,
+   "val_score": -0.11941747572815534,
+   "val_catalogued": {
+    "correct_name": 0.39223300970873787,
+    "correct_make": 0.013592233009708738,
+    "unknown": 0.2737864077669903,
+    "wrong": 0.32038834951456313,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.1436893203883495,
+    "unknown": 0.3572815533980582,
+    "wrong": 0.48349514563106794,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.3,
+   "make_conf": 0.4,
+   "val_score": -0.08932038834951461,
+   "val_catalogued": {
+    "correct_name": 0.39223300970873787,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.34563106796116505,
+    "wrong": 0.26019417475728157,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.09514563106796116,
+    "unknown": 0.46601941747572817,
+    "wrong": 0.42330097087378643,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.3,
+   "make_conf": 0.5,
+   "val_score": -0.07087378640776701,
+   "val_catalogued": {
+    "correct_name": 0.39223300970873787,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.3864077669902913,
+    "wrong": 0.21941747572815534,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.05048543689320388,
+    "unknown": 0.5514563106796116,
+    "wrong": 0.3825242718446602,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.3,
+   "make_conf": 0.6,
+   "val_score": -0.056310679611650497,
+   "val_catalogued": {
+    "correct_name": 0.39223300970873787,
+    "correct_make": 0.0,
+    "unknown": 0.4174757281553398,
+    "wrong": 0.19029126213592232,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.6077669902912621,
+    "wrong": 0.3533980582524272,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.3,
+   "make_conf": 0.7,
+   "val_score": -0.05145631067961165,
+   "val_catalogued": {
+    "correct_name": 0.39223300970873787,
+    "correct_make": 0.0,
+    "unknown": 0.43106796116504853,
+    "wrong": 0.1766990291262136,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.015533980582524271,
+    "correct_make": 0.005825242718446602,
+    "unknown": 0.6388349514563106,
+    "wrong": 0.33980582524271846,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.4,
+   "make_conf": 0.3,
+   "val_score": -0.09223300970873785,
+   "val_catalogued": {
+    "correct_name": 0.3883495145631068,
+    "correct_make": 0.019417475728155338,
+    "unknown": 0.27766990291262134,
+    "wrong": 0.3145631067961165,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.16310679611650486,
+    "unknown": 0.36893203883495146,
+    "wrong": 0.45436893203883494,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.4,
+   "make_conf": 0.4,
+   "val_score": -0.06504854368932037,
+   "val_catalogued": {
+    "correct_name": 0.3883495145631068,
+    "correct_make": 0.007766990291262136,
+    "unknown": 0.34951456310679613,
+    "wrong": 0.2543689320388349,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.1087378640776699,
+    "unknown": 0.48349514563106794,
+    "wrong": 0.3941747572815534,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.4,
+   "make_conf": 0.5,
+   "val_score": -0.0495145631067961,
+   "val_catalogued": {
+    "correct_name": 0.3883495145631068,
+    "correct_make": 0.007766990291262136,
+    "unknown": 0.39029126213592236,
+    "wrong": 0.21359223300970873,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.05825242718446602,
+    "unknown": 0.574757281553398,
+    "wrong": 0.3533980582524272,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.4,
+   "make_conf": 0.6,
+   "val_score": -0.038834951456310676,
+   "val_catalogued": {
+    "correct_name": 0.3883495145631068,
+    "correct_make": 0.001941747572815534,
+    "unknown": 0.42524271844660194,
+    "wrong": 0.18446601941747573,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.027184466019417475,
+    "unknown": 0.6349514563106796,
+    "wrong": 0.32427184466019415,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.4,
+   "make_conf": 0.7,
+   "val_score": -0.03689320388349514,
+   "val_catalogued": {
+    "correct_name": 0.3883495145631068,
+    "correct_make": 0.0,
+    "unknown": 0.4407766990291262,
+    "wrong": 0.170873786407767,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.005825242718446602,
+    "unknown": 0.6699029126213593,
+    "wrong": 0.3106796116504854,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.5,
+   "make_conf": 0.3,
+   "val_score": -0.054368932038834944,
+   "val_catalogued": {
+    "correct_name": 0.3766990291262136,
+    "correct_make": 0.03300970873786408,
+    "unknown": 0.2815533980582524,
+    "wrong": 0.3087378640776699,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.19223300970873786,
+    "unknown": 0.3786407766990291,
+    "wrong": 0.4155339805825243,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.5,
+   "make_conf": 0.4,
+   "val_score": -0.03009708737864074,
+   "val_catalogued": {
+    "correct_name": 0.3766990291262136,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.3533980582524272,
+    "wrong": 0.24854368932038834,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.13203883495145632,
+    "unknown": 0.49902912621359224,
+    "wrong": 0.3553398058252427,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.5,
+   "make_conf": 0.5,
+   "val_score": -0.017475728155339765,
+   "val_catalogued": {
+    "correct_name": 0.3766990291262136,
+    "correct_make": 0.021359223300970873,
+    "unknown": 0.39611650485436894,
+    "wrong": 0.2058252427184466,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.07378640776699029,
+    "unknown": 0.5980582524271845,
+    "wrong": 0.3145631067961165,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.5,
+   "make_conf": 0.6,
+   "val_score": -0.012621359223300946,
+   "val_catalogued": {
+    "correct_name": 0.3766990291262136,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.4349514563106796,
+    "wrong": 0.1766990291262136,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.03495145631067961,
+    "unknown": 0.6660194174757281,
+    "wrong": 0.2854368932038835,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.5,
+   "make_conf": 0.7,
+   "val_score": -0.013592233009708729,
+   "val_catalogued": {
+    "correct_name": 0.3766990291262136,
+    "correct_make": 0.005825242718446602,
+    "unknown": 0.45436893203883494,
+    "wrong": 0.16310679611650486,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.7029126213592233,
+    "wrong": 0.27184466019417475,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.6,
+   "make_conf": 0.3,
+   "val_score": -0.03398058252427186,
+   "val_catalogued": {
+    "correct_name": 0.37087378640776697,
+    "correct_make": 0.036893203883495145,
+    "unknown": 0.2854368932038835,
+    "wrong": 0.3067961165048544,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.20970873786407768,
+    "unknown": 0.3844660194174757,
+    "wrong": 0.39223300970873787,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.6,
+   "make_conf": 0.4,
+   "val_score": -0.011650485436893218,
+   "val_catalogued": {
+    "correct_name": 0.37087378640776697,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.3592233009708738,
+    "wrong": 0.24660194174757283,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.14757281553398058,
+    "unknown": 0.5067961165048543,
+    "wrong": 0.3320388349514563,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.6,
+   "make_conf": 0.5,
+   "val_score": -0.0009708737864077693,
+   "val_catalogued": {
+    "correct_name": 0.37087378640776697,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.40194174757281553,
+    "wrong": 0.20388349514563106,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.0854368932038835,
+    "unknown": 0.6097087378640776,
+    "wrong": 0.2912621359223301,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.6,
+   "make_conf": 0.6,
+   "val_score": 0.0019417475728155248,
+   "val_catalogued": {
+    "correct_name": 0.37087378640776697,
+    "correct_make": 0.013592233009708738,
+    "unknown": 0.4407766990291262,
+    "wrong": 0.17475728155339806,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.04271844660194175,
+    "unknown": 0.6815533980582524,
+    "wrong": 0.2621359223300971,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.6,
+   "make_conf": 0.7,
+   "val_score": -0.002912621359223308,
+   "val_catalogued": {
+    "correct_name": 0.37087378640776697,
+    "correct_make": 0.005825242718446602,
+    "unknown": 0.4621359223300971,
+    "wrong": 0.16116504854368932,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.013592233009708738,
+    "correct_make": 0.013592233009708738,
+    "unknown": 0.7242718446601941,
+    "wrong": 0.24854368932038834,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.8,
+   "make_conf": 0.3,
+   "val_score": -0.0048543689320388606,
+   "val_catalogued": {
+    "correct_name": 0.3339805825242718,
+    "correct_make": 0.07184466019417475,
+    "unknown": 0.29514563106796116,
+    "wrong": 0.29902912621359223,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.011650485436893204,
+    "correct_make": 0.23106796116504855,
+    "unknown": 0.39805825242718446,
+    "wrong": 0.3592233009708738,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.8,
+   "make_conf": 0.4,
+   "val_score": 0.01262135922330096,
+   "val_catalogued": {
+    "correct_name": 0.3339805825242718,
+    "correct_make": 0.05631067961165048,
+    "unknown": 0.37087378640776697,
+    "wrong": 0.23883495145631067,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.011650485436893204,
+    "correct_make": 0.16116504854368932,
+    "unknown": 0.5281553398058253,
+    "wrong": 0.29902912621359223,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.8,
+   "make_conf": 0.5,
+   "val_score": 0.016504854368932023,
+   "val_catalogued": {
+    "correct_name": 0.3339805825242718,
+    "correct_make": 0.04660194174757282,
+    "unknown": 0.42330097087378643,
+    "wrong": 0.19611650485436893,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.011650485436893204,
+    "correct_make": 0.09320388349514563,
+    "unknown": 0.6388349514563106,
+    "wrong": 0.2563106796116505,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.8,
+   "make_conf": 0.6,
+   "val_score": 0.011650485436893204,
+   "val_catalogued": {
+    "correct_name": 0.3339805825242718,
+    "correct_make": 0.02330097087378641,
+    "unknown": 0.47572815533980584,
+    "wrong": 0.1669902912621359,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.011650485436893204,
+    "correct_make": 0.04854368932038835,
+    "unknown": 0.7126213592233009,
+    "wrong": 0.22718446601941747,
+    "classifier_answer": 0.16893203883495145
+   }
+  },
+  {
+   "w": 1.0,
+   "name_conf": 0.8,
+   "make_conf": 0.7,
+   "val_score": 0.002912621359223308,
+   "val_catalogued": {
+    "correct_name": 0.3339805825242718,
+    "correct_make": 0.011650485436893204,
+    "unknown": 0.5009708737864078,
+    "wrong": 0.1533980582524272,
+    "classifier_answer": 0.1436893203883495
+   },
+   "val_uncatalogued": {
+    "correct_name": 0.011650485436893204,
+    "correct_make": 0.015533980582524271,
+    "unknown": 0.7592233009708738,
+    "wrong": 0.21359223300970873,
+    "classifier_answer": 0.16893203883495145
+   }
+  }
+ ],
+ "test_catalogued_new": {
+  "correct_name": 0.556399544246107,
+  "correct_make": 0.18837827573110522,
+  "unknown": 0.08108621344473985,
+  "wrong": 0.17413596657804786,
+  "classifier_answer": 0.14868970755791872
+ },
+ "test_catalogued_old": {
+  "correct_name": 0.6895176604633498,
+  "correct_make": 0.0,
+  "unknown": 0.05165210786175465,
+  "wrong": 0.25883023167489555,
+  "classifier_answer": 0.14868970755791872
+ },
+ "test_uncatalogued_new": {
+  "correct_name": 0.021078617546524875,
+  "correct_make": 0.38264337257880743,
+  "unknown": 0.2502848461830611,
+  "wrong": 0.34599316369160654,
+  "classifier_answer": 0.17318647930117737
+ },
+ "test_uncatalogued_old": {
+  "correct_name": 0.05507026205848842,
+  "correct_make": 0.0,
+  "unknown": 0.281048233953665,
+  "wrong": 0.6638815039878465,
+  "classifier_answer": 0.17318647930117737
+ },
+ "test_known_cars_shown_as": {
+  "trained_class": 0.984703395100112,
+  "open_set_named": 0.0013679890560875513,
+  "make_only": 0.010819549807237906,
+  "unknown": 0.0031090660365626164
+ },
+ "test_known_cars_make_only_accuracy": 0.7816091954022989
+}

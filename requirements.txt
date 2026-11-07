@@ -1,0 +1,22 @@
+# Runtime + app (CPU is fine). For GPU training install torch/torchvision from
+# https://download.pytorch.org/whl/cu128 first (see README).
+torch>=2.5
+torchvision>=0.20
+timm>=1.0
+open_clip_torch>=2.24   # CLIP ViT-B/16: vehicle gate, open-vocabulary naming, robust fine-tuned classifier
+ultralytics>=8.3
+opencv-python-headless>=4.9
+scikit-learn>=1.5
+scikit-image>=0.24
+scipy>=1.13
+numpy>=1.26
+pandas>=2.2
+joblib>=1.4
+matplotlib>=3.8
+tqdm>=4.66
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+gradio>=5.0            # only for the legacy UI in app_gradio.py
+onnx>=1.16
+onnxruntime>=1.18

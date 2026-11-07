@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+runs/
+*.log
+.gradio/
+flagged/
+.env
+*.onnx
+!models/classifier_int8.onnx
+yolo11*.pt
+.DS_Store
+
+# local tooling / editor temp files
+.claude/
+~$*
+*.tmp
+Thumbs.db

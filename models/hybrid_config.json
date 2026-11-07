@@ -1,0 +1,20 @@
+{
+ "fusion_weight": 0.0,
+ "conf_threshold": 0.67,
+ "make_threshold": 0.67,
+ "tta": true,
+ "enhance": true,
+ "temperature": 0.65,
+ "clip_temperature": 0.5,
+ "ensemble_weight": 0.3,
+ "outside_threshold": 0.3,
+ "known_conf": 0.7,
+ "gate_threshold": 0.5,
+ "gate_strong": 0.9,
+ "gate_det_conf": 0.3,
+ "open_min_top": 0.2,
+ "open_require_disagreement": false,
+ "unknown_make_weight": 0.5,
+ "open_name_conf": 0.8,
+ "unknown_make_conf": 0.4
+}

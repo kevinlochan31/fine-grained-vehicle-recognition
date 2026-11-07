@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutoLens - Optical Vehicle Intelligence</title>
+  <meta name="description" content="Point AutoLens at a car: it finds it, repairs the image and names the make, model and year among 196 classes, with a hybrid of classical computer vision and deep learning." />
+  <meta name="theme-color" content="#05070d" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c6ff3d'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%2305070d' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%2305070d'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="is-booting">
+  <a class="skip-link" href="#scan">Skip to the scanner</a>
+
+  <!-- boot sequence -->
+  <div class="boot" id="boot" aria-hidden="true">
+    <div class="boot__inner">
+      <div class="boot__log mono" id="boot-log"></div>
+      <div class="boot__count"><span id="boot-num">000</span><small>%</small></div>
+      <div class="boot__bar"><i id="boot-bar"></i></div>
+    </div>
+    <div class="boot__curtain" id="boot-curtain"></div>
+  </div>
+
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__dot"></span><span class="cursor__ring"></span><span class="cursor__label" id="cursor-label"></span></div>
+  <div class="progress" aria-hidden="true"><i id="progress"></i></div>
+
+  <header class="nav" id="nav">
+    <a class="logo" href="#top" aria-label="AutoLens, back to top">
+      <span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="16" cy="16" r="3.5" fill="currentColor"/><path d="M16 1v6M16 25v6M1 16h6M25 16h6" stroke="currentColor" stroke-width="2.5"/></svg></span>
+      <span class="logo__word">AUTOLENS</span>
+    </a>
+    <nav class="nav__links" aria-label="Sections">
+      <a href="#scan" data-nav="scan"><span class="mono">01</span> Scan</a>
+      <a href="#numbers" data-nav="numbers"><span class="mono">02</span> Results</a>
+      <a href="#pipeline" data-nav="pipeline"><span class="mono">03</span> Pipeline</a>
+    </nav>
+    <span class="nav__status mono" id="status"><i class="dot"></i><span id="status-text">CONNECTING</span></span>
+  </header>
+
+  <main id="top">
+    <!-- ================================================================ HERO -->
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <canvas class="hero__canvas" id="particles" aria-hidden="true"></canvas>
+      <div class="hero__content">
+        <p class="kicker mono"><span class="blink">●</span> P5 · Stanford Cars · 196 classes · 16,185 images</p>
+        <h1 class="hero__title" id="hero-title">
+          <span class="line"><span class="word" data-split>See</span> <span class="word" data-split>every</span></span>
+          <span class="line"><span class="word outline" data-split>car.</span> <span class="word accent" data-split>Name</span></span>
+          <span class="line"><span class="word" data-split>it.</span></span>
+        </h1>
+        <p class="hero__lede" data-fade>Drop a photo. AutoLens checks it really is a car, locks onto it, repairs the image with classical vision and names its <b>make, model and year</b>. Even models it was never trained on get named, and it tells you exactly how sure it is.</p>
+        <div class="hero__cta" data-fade>
+          <a class="btn btn--lime magnetic" href="#scan" data-cursor="Scan">
+            <span>Start a scan</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn--line magnetic" href="#numbers" data-cursor="Data">See the numbers</a>
+        </div>
+      </div>
+      <dl class="hero__stats" data-fade>
+        <div><dt>Top-1 accuracy</dt><dd class="mono" data-count="95.9" data-suffix="%">0</dd></div>
+        <div><dt>Top-5 accuracy</dt><dd class="mono" data-count="99.7" data-suffix="%">0</dd></div>
+        <div><dt>Detection mAP@.5</dt><dd class="mono" data-count="0.989" data-dec="3">0</dd></div>
+        <div><dt>Latency (GPU)</dt><dd class="mono" data-count="150" data-dec="0" data-suffix="ms">0</dd></div>
+      </dl>
+      <div class="hero__scroll mono" aria-hidden="true"><span>Scroll</span><i></i></div>
+    </section>
+
+    <!-- ================================================================ MARQUEE -->
+    <section class="marquee" aria-label="The 196 recognisable classes">
+      <div class="marquee__row" id="mq1"></div>
+      <div class="marquee__row marquee__row--rev" id="mq2"></div>
+    </section>
+
+    <!-- ================================================================ SCANNER -->
+    <section class="section scan" id="scan" aria-labelledby="scan-title">
+      <header class="section__head" data-reveal>
+        <span class="section__num mono">01 / SCAN</span>
+        <h2 id="scan-title">Feed the <em>lens</em>.</h2>
+        <p>Upload, drag, paste or pick one of eight test images the model has never seen. Every scan runs the classical, deep and hybrid pipelines side by side.</p>
+      </header>
+
+      <div class="scan__grid">
+        <!-- input -->
+        <div class="panel hud" data-reveal>
+          <span class="hud__corner tl"></span><span class="hud__corner tr"></span><span class="hud__corner bl"></span><span class="hud__corner br"></span>
+          <div class="panel__bar mono"><span>INPUT</span><span>JPG · PNG · WEBP ≤ 15 MB</span></div>
+          <label class="drop" id="dropzone" for="file" data-cursor="Drop">
+            <span class="drop__reticle" aria-hidden="true">
+              <svg viewBox="0 0 200 200">
+                <circle class="r1" cx="100" cy="100" r="88"/>
+                <circle class="r2" cx="100" cy="100" r="70"/>
+                <circle class="r3" cx="100" cy="100" r="46"/>
+                <path class="ticks" d="M100 2v18M100 180v18M2 100h18M180 100h18"/>
+                <path class="plus" d="M100 82v36M82 100h36"/>
+              </svg>
+            </span>
+            <strong>Drop a car photo</strong>
+            <small>or <u>browse</u> · paste · camera</small>
+            <input id="file" class="sr-only" type="file" accept="image/jpeg,image/png,image/webp,image/bmp" />
+          </label>
+          <div class="strip">
+            <p class="mono strip__title" id="examples-title">UNSEEN TEST IMAGES</p>
+            <div class="strip__row" id="examples" role="list" aria-labelledby="examples-title"></div>
+          </div>
+          <div class="quality" id="quality-wrap" hidden>
+            <p class="mono strip__title">IMAGE-QUALITY TELEMETRY</p>
+            <div class="quality__grid" id="quality"></div>
+          </div>
+        </div>
+
+        <!-- output -->
+        <div class="panel hud panel--out" data-reveal>
+          <span class="hud__corner tl"></span><span class="hud__corner tr"></span><span class="hud__corner bl"></span><span class="hud__corner br"></span>
+          <div class="panel__bar mono"><span>OPTICAL OUTPUT</span><span id="latency-hint">IDLE</span></div>
+          <div class="stage" id="stage" aria-live="polite" aria-busy="false">
+            <div class="stage__empty" id="stage-empty">
+              <div class="radar" aria-hidden="true"><i></i></div>
+              <p class="mono">AWAITING TARGET</p>
+              <p class="muted">The bounding box, the identification and the confidence will appear here.</p>
+            </div>
+            <div class="viewer" id="viewer" hidden>
+              <img id="photo" alt="Uploaded vehicle photo" />
+              <svg class="overlay" id="overlay" aria-hidden="true"></svg>
+              <div class="scanfx" aria-hidden="true"><div class="scanfx__grid"></div><div class="scanfx__beam" id="beam"></div></div>
+              <div class="lock mono" id="lock" aria-hidden="true">TARGET LOCKED</div>
+            </div>
+            <div class="loading mono" role="status"><span class="loading__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="loading-text">ACQUIRING…</span></div>
+          </div>
+
+          <div class="alert" id="error" role="alert" hidden>
+            <span class="mono alert__code">ERR</span>
+            <div><b>Could not analyse this image.</b><p id="error-text"></p><button class="btn btn--line btn--sm" id="retry" type="button">Try again</button></div>
+          </div>
+
+          <div class="readout" id="result" hidden>
+            <div class="readout__main">
+              <div class="gauge" aria-hidden="true">
+                <svg viewBox="0 0 120 120"><circle class="gauge__bg" cx="60" cy="60" r="52"/><circle class="gauge__fg" id="gauge" cx="60" cy="60" r="52"/><circle class="gauge__tick" id="gauge-tick" cx="112" cy="60" r="3.5"/></svg>
+                <div class="gauge__val"><b class="mono" id="r-conf">0</b><small class="mono" id="gauge-label">CONF %</small></div>
+              </div>
+              <div class="readout__id">
+                <span class="mono readout__make" id="r-make"></span>
+                <h3 class="readout__model"><span id="r-model"></span></h3>
+                <div class="readout__tags"><span class="tag mono" id="r-year"></span><span class="badge" id="r-badge"></span></div>
+                <p class="readout__note" id="r-threshold"></p>
+              </div>
+            </div>
+            <div class="facts" id="r-facts"></div>
+            <div class="top5" id="top5-wrap">
+              <p class="mono strip__title" id="top5-title">TOP-5 CANDIDATES · HYBRID</p>
+              <ol id="r-top5"></ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="duel" id="compare-section" hidden>
+        <header class="subhead" data-reveal><span class="mono">VERSUS</span><h3>Classical vs deep vs hybrid, on your photo</h3></header>
+        <div class="duel__grid" id="compare"></div>
+      </div>
+
+      <div class="layers" id="steps-section" hidden>
+        <header class="subhead"><span class="mono">X-RAY</span><h3>Inside the classical pipeline</h3></header>
+        <div class="layers__grid" id="gallery"></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ NUMBERS -->
+    <section class="section numbers" id="numbers" aria-labelledby="numbers-title">
+      <header class="section__head" data-reveal>
+        <span class="section__num mono">02 / RESULTS</span>
+        <h2 id="numbers-title">Measured on <em>8,041</em> images it never saw.</h2>
+        <p>No test image was used for training or tuning. Fusion weight, temperature and thresholds were chosen on a separate validation split.</p>
+      </header>
+      <div class="big" id="kpis"></div>
+      <div class="charts" id="charts"></div>
+    </section>
+
+    <!-- ================================================================ PIPELINE -->
+    <section class="section pipe" id="pipeline" aria-labelledby="pipe-title">
+      <header class="section__head" data-reveal>
+        <span class="section__num mono">03 / PIPELINE</span>
+        <h2 id="pipe-title">Classical eyes. <em>Deep</em> memory.</h2>
+        <p>Classical computer vision measures and repairs the image, deep networks localise and identify, and a hybrid layer decides what to trust.</p>
+      </header>
+      <div class="timeline" id="timeline"><div class="timeline__line"><i id="timeline-fill"></i></div><ol id="pipeline-steps"></ol></div>
+      <figure class="arch panel" data-reveal>
+        <div class="panel__bar mono"><span>SYSTEM ARCHITECTURE</span><span>docs/architecture.png</span></div>
+        <img src="/docs-assets/architecture.png" alt="System architecture: web UI and FastAPI, validation and quality analysis, YOLO11 detector with enhancement retry and classical fallback, ROI crop, two-view ConvNeXt classifier, temperature scaling, late fusion with classical features, low-confidence back-off, JSON response." loading="lazy" width="2100" height="1000" />
+      </figure>
+      <div class="ethics">
+        <div class="panel" data-reveal><p class="mono strip__title">LIMITS</p><ul>
+          <li>Closed set of 196 Stanford Cars classes, mostly US-market cars 1991-2012. Unknown models map to the nearest class: read the confidence.</li>
+          <li>Year is the hardest attribute: some generations look identical.</li>
+          <li>One primary vehicle per photo.</li></ul></div>
+        <div class="panel" data-reveal><p class="mono strip__title">RESPONSIBLE USE</p><ul>
+          <li>Recognises vehicle types only: no number plates, people or tracking.</li>
+          <li>Photos are processed in memory and never stored.</li>
+          <li>Below the confidence threshold it backs off to a coarser answer instead of bluffing.</li></ul></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="footer__giant" aria-hidden="true">AUTOLENS</p>
+    <p class="mono">Computer Vision Hackathon 2026 · Problem P5 · Stanford Cars (Krause et al., 2013) · images keep their original licences.</p>
+  </footer>
+
+  <div class="tooltip mono" id="tooltip" role="tooltip"></div>
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__scrim" data-close></div>
+    <div class="modal__panel panel">
+      <div class="panel__bar mono"><span id="modal-title"></span>
+        <button class="icon-btn" type="button" data-close aria-label="Close preview"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
+      <img id="modal-img" alt="" />
+      <p class="muted" id="modal-cap"></p>
+    </div>
+  </div>
+
+  <script src="/static/vendor/motion.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

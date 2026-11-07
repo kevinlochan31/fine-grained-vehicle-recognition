@@ -1,0 +1,86 @@
+{
+ "eval_sets": {
+  "val": 788,
+  "test_subset": 1500
+ },
+ "variants": {
+  "fp32 (PyTorch)": {
+   "size_mb": 106.76,
+   "val_top1": 0.9568527918781726,
+   "val_top5": 0.998730964467005,
+   "test_top1": 0.9386666666666666,
+   "test_top5": 0.99,
+   "latency_gpu_ms": 8.23839333364352,
+   "latency_cpu_ms": 74.16672999970615,
+   "note": ""
+  },
+  "fp16 (PyTorch, GPU)": {
+   "size_mb": 53.4,
+   "val_top1": 0.9568527918781726,
+   "val_top5": 0.998730964467005,
+   "test_top1": 0.9386666666666666,
+   "test_top5": 0.99,
+   "latency_gpu_ms": 5.470516666537151,
+   "latency_cpu_ms": null,
+   "note": "reduced precision; deployed weights file"
+  },
+  "fp32 (ONNX Runtime, CPU)": {
+   "size_mb": 106.77,
+   "val_top1": 0.9568527918781726,
+   "val_top5": 0.998730964467005,
+   "test_top1": 0.9386666666666666,
+   "test_top5": 0.99,
+   "latency_gpu_ms": null,
+   "latency_cpu_ms": 46.00846500034095,
+   "note": ""
+  },
+  "int8 static quant (ONNX Runtime, CPU)": {
+   "size_mb": 27.34,
+   "val_top1": 0.949238578680203,
+   "val_top5": 0.998730964467005,
+   "test_top1": 0.9373333333333334,
+   "test_top5": 0.99,
+   "latency_gpu_ms": null,
+   "latency_cpu_ms": 40.558094999869354,
+   "note": "200 training crops for calibration"
+  },
+  "pruned 30% (global L1) + fp16": {
+   "size_mb": 40.99,
+   "val_top1": 0.9086294416243654,
+   "val_top5": 0.9758883248730964,
+   "test_top1": 0.8966666666666666,
+   "test_top5": 0.9766666666666667,
+   "latency_gpu_ms": null,
+   "latency_cpu_ms": null,
+   "note": "size = gzip-compressed sparse weights; no fine-tuning after pruning"
+  },
+  "pruned 50% (global L1) + fp16": {
+   "size_mb": 32.94,
+   "val_top1": 0.16878172588832488,
+   "val_top5": 0.3197969543147208,
+   "test_top1": 0.16,
+   "test_top5": 0.32,
+   "latency_gpu_ms": null,
+   "latency_cpu_ms": null,
+   "note": "size = gzip-compressed sparse weights; no fine-tuning after pruning"
+  }
+ },
+ "classifier_params_M": 27.97,
+ "detector": {
+  "weights": "yolo_cars.pt (YOLO11s fine-tuned)",
+  "size_mb": 18.28,
+  "params_M": 9.43,
+  "latency_gpu_ms": 8.01320000027772,
+  "latency_cpu_ms": 38.516819999495056
+ },
+ "clip": {
+  "clip_ft_ms_cuda": 8.881766666794041,
+  "clip_gate_and_naming_ms_cuda": 6.561856666909686,
+  "clip_ft_params_M": 86.3,
+  "clip_zero_shot_visual_params_M": 86.2,
+  "clip_ft_ms_cpu": 134.76281999901403,
+  "clip_gate_and_naming_ms_cpu": 122.43041999900015,
+  "clip_ft_size_mb": 164.6,
+  "note": "CLIP ViT-B/16 fine-tune: FP16 weights; latency includes flip TTA (2 passes). Gate + naming: one ViT-B/16 forward for frame and crop, text embeddings precomputed at start-up."
+ }
+}

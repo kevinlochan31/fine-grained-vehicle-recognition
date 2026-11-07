@@ -1,0 +1,822 @@
+{
+ "hybrid_config": {
+  "fusion_weight": 0.0,
+  "conf_threshold": 0.67,
+  "make_threshold": 0.67,
+  "tta": true,
+  "enhance": true,
+  "temperature": 0.65,
+  "clip_temperature": 0.5,
+  "ensemble_weight": 0.3,
+  "outside_threshold": 0.3,
+  "known_conf": 0.7,
+  "gate_threshold": 0.5,
+  "gate_strong": 0.9,
+  "gate_det_conf": 0.3,
+  "open_min_top": 0.2,
+  "open_require_disagreement": false,
+  "unknown_make_weight": 0.5,
+  "open_name_conf": 0.8,
+  "unknown_make_conf": 0.4
+ },
+ "val_fusion_search": {
+  "0.0": 0.9720812182741116,
+  "0.025": 0.9720812182741116,
+  "0.05": 0.9720812182741116,
+  "0.075": 0.9720812182741116,
+  "0.1": 0.9720812182741116,
+  "0.125": 0.9720812182741116,
+  "0.15": 0.9720812182741116,
+  "0.175": 0.9720812182741116,
+  "0.2": 0.9720812182741116,
+  "0.225": 0.9720812182741116,
+  "0.25": 0.9720812182741116,
+  "0.275": 0.9720812182741116,
+  "0.3": 0.9720812182741116,
+  "0.325": 0.9720812182741116,
+  "0.35": 0.9720812182741116,
+  "0.375": 0.9720812182741116,
+  "0.4": 0.9720812182741116
+ },
+ "calibration": {
+  "temperature": 0.65,
+  "val_nll_T1": 0.31696459650993347,
+  "val_nll_best": 0.18972957134246826,
+  "test_ece_hybrid_before": 0.11756360621101568,
+  "test_ece_hybrid_after": 0.010588023640625888
+ },
+ "comparison": {
+  "classical features (detected crop -> HOG+LBP+colour+edge+geometry -> PCA+LogReg)": {
+   "top1": 0.14525556522820546,
+   "top5": 0.3294366372341749,
+   "make_acc": 0.2401442606640965,
+   "make_model_acc": 0.1491108071135431,
+   "mean_conf": 0.1792706698179245,
+   "ece": 0.03467469731874615
+  },
+  "deep learning (YOLO crop -> ConvNeXt)": {
+   "top1": 0.9451560751150354,
+   "top5": 0.9919164283049372,
+   "make_acc": 0.9840815818927994,
+   "make_model_acc": 0.9510011192637732,
+   "mean_conf": 0.9548153281211853,
+   "ece": 0.01719286116093731
+  },
+  "hybrid (YOLO + adaptive enhancement views + flip TTA + ConvNeXt/CLIP ensemble)": {
+   "top1": 0.9589603283173734,
+   "top5": 0.9975127471707499,
+   "make_acc": 0.9910458898146997,
+   "make_model_acc": 0.9638104713344111,
+   "mean_conf": 0.9555739760398865,
+   "ece": 0.010588023640625888
+  }
+ },
+ "ablation": {
+  "full hybrid": {
+   "top1": 0.9589603283173734,
+   "top5": 0.9975127471707499
+  },
+  "- classical feature fusion": {
+   "top1": 0.9589603283173734,
+   "top5": 0.9975127471707499
+  },
+  "- flip TTA": {
+   "top1": 0.9573436139783609,
+   "top5": 0.9972640218878249
+  },
+  "- adaptive enhancement view": {
+   "top1": 0.9585872403929859,
+   "top5": 0.9975127471707499
+  },
+  "enhanced crop replaces original (instead of averaging)": {
+   "top1": 0.9589603283173734,
+   "top5": 0.9971396592463624
+  },
+  "- fusion - TTA - enhancement (= deep only)": {
+   "top1": 0.9451560751150354,
+   "top5": 0.9919164283049372
+  },
+  "- detection crop (whole image -> crop-trained CNN)": {
+   "top1": 0.9032458649421714,
+   "top5": 0.974381295858724
+  },
+  "oracle: ground-truth box crop (upper bound for localisation)": {
+   "top1": 0.9463997015296605,
+   "top5": 0.9921651535878622
+  },
+  "- detection crop (CNN trained & tested on whole images)": {
+   "top1": 0.9284914811590598,
+   "top5": 0.9922895162293247
+  },
+  "- CLIP fine-tune (ConvNeXt-only hybrid)": {
+   "top1": 0.9461509762467355,
+   "top5": 0.9916677030220122
+  },
+  "CLIP fine-tune alone (with TTA + enhancement views)": {
+   "top1": 0.9568461634125108,
+   "top5": 0.9976371098122124
+  },
+  "CLIP fine-tune alone, single pass": {
+   "top1": 0.9556025369978859,
+   "top5": 0.9975127471707499
+  }
+ },
+ "enhancement_subset": {
+  "n_triggered": 1511,
+  "fraction": 0.18791195124984456,
+  "deep_top1": 0.9344804765056254,
+  "tta_only_top1": 0.9371277299801456,
+  "enhanced_replaces_top1": 0.9358041032428855,
+  "hybrid_top1": 0.9563203176704169
+ },
+ "detection": [
+  {
+   "detector": "yolo11s_finetuned",
+   "mean_iou": 0.9536759458444268,
+   "median_iou": 0.9657512820755879,
+   "iou_ge_0_5": 0.9990050988682999,
+   "iou_ge_0_75": 0.9915433403805497,
+   "mAP50": 0.9894230014706255,
+   "mAP50_95": 0.9312508499817568,
+   "ms_per_img": 10.934020383290811,
+   "missed": 1
+  },
+  {
+   "detector": "yolo11n_coco_pretrained",
+   "mean_iou": 0.9437092823542693,
+   "median_iou": 0.9579847025942507,
+   "iou_ge_0_5": 0.9957716701902748,
+   "iou_ge_0_75": 0.9860713841561994,
+   "mAP50": 0.8535994672756445,
+   "mAP50_95": 0.7843384650664285,
+   "ms_per_img": 10.675446913880634,
+   "missed": 10
+  },
+  {
+   "detector": "classical_edge_contour_roi",
+   "mean_iou": 0.653547835211998,
+   "median_iou": 0.6566666666666666,
+   "iou_ge_0_5": 0.7951747295112548,
+   "iou_ge_0_75": 0.3162541972391494,
+   "mAP50": 0.6409330910114615,
+   "mAP50_95": 0.22544341189676348,
+   "ms_per_img": 3.5735847560748306,
+   "missed": 0
+  }
+ ],
+ "class_aware_mAP50": {
+  "hybrid": 0.9442699535202105,
+  "deep": 0.9269678245765154,
+  "classical": 0.0724059651606269
+ },
+ "threshold_analysis": [
+  {
+   "threshold": 0.0,
+   "coverage": 1.0,
+   "accuracy_on_accepted": 0.9589603283173734,
+   "rejected_error_fraction": null
+  },
+  {
+   "threshold": 0.05,
+   "coverage": 1.0,
+   "accuracy_on_accepted": 0.9589603283173734,
+   "rejected_error_fraction": null
+  },
+  {
+   "threshold": 0.1,
+   "coverage": 1.0,
+   "accuracy_on_accepted": 0.9589603283173734,
+   "rejected_error_fraction": null
+  },
+  {
+   "threshold": 0.15,
+   "coverage": 1.0,
+   "accuracy_on_accepted": 0.9589603283173734,
+   "rejected_error_fraction": null
+  },
+  {
+   "threshold": 0.2,
+   "coverage": 0.9998756373585375,
+   "accuracy_on_accepted": 0.9590796019900497,
+   "rejected_error_fraction": 1.0
+  },
+  {
+   "threshold": 0.25,
+   "coverage": 0.999253824151225,
+   "accuracy_on_accepted": 0.9594275046670815,
+   "rejected_error_fraction": 0.6666666666666666
+  },
+  {
+   "threshold": 0.3,
+   "coverage": 0.9982589230195249,
+   "accuracy_on_accepted": 0.9600099663635231,
+   "rejected_error_fraction": 0.6428571428571429
+  },
+  {
+   "threshold": 0.35,
+   "coverage": 0.9970152966048998,
+   "accuracy_on_accepted": 0.9608332293875514,
+   "rejected_error_fraction": 0.6666666666666666
+  },
+  {
+   "threshold": 0.4,
+   "coverage": 0.9958960328317373,
+   "accuracy_on_accepted": 0.9611638361638362,
+   "rejected_error_fraction": 0.5757575757575758
+  },
+  {
+   "threshold": 0.45,
+   "coverage": 0.9926626041537122,
+   "accuracy_on_accepted": 0.9631671260335756,
+   "rejected_error_fraction": 0.6101694915254238
+  },
+  {
+   "threshold": 0.5,
+   "coverage": 0.987439373212287,
+   "accuracy_on_accepted": 0.9649874055415617,
+   "rejected_error_fraction": 0.5148514851485149
+  },
+  {
+   "threshold": 0.55,
+   "coverage": 0.9808481532147743,
+   "accuracy_on_accepted": 0.9676683149486497,
+   "rejected_error_fraction": 0.487012987012987
+  },
+  {
+   "threshold": 0.6,
+   "coverage": 0.972142768312399,
+   "accuracy_on_accepted": 0.972112063451452,
+   "rejected_error_fraction": 0.5
+  },
+  {
+   "threshold": 0.65,
+   "coverage": 0.9619450317124736,
+   "accuracy_on_accepted": 0.9750484809308338,
+   "rejected_error_fraction": 0.4477124183006536
+  },
+  {
+   "threshold": 0.7,
+   "coverage": 0.9502549434149982,
+   "accuracy_on_accepted": 0.978013349038084,
+   "rejected_error_fraction": 0.405
+  },
+  {
+   "threshold": 0.75,
+   "coverage": 0.9344608879492601,
+   "accuracy_on_accepted": 0.9815011977641735,
+   "rejected_error_fraction": 0.36242884250474383
+  },
+  {
+   "threshold": 0.8,
+   "coverage": 0.9185424698420595,
+   "accuracy_on_accepted": 0.9838884375846195,
+   "rejected_error_fraction": 0.32213740458015266
+  },
+  {
+   "threshold": 0.85,
+   "coverage": 0.9027484143763214,
+   "accuracy_on_accepted": 0.9852596776415484,
+   "rejected_error_fraction": 0.2851662404092072
+  },
+  {
+   "threshold": 0.9,
+   "coverage": 0.8776271608008954,
+   "accuracy_on_accepted": 0.9875301119455859,
+   "rejected_error_fraction": 0.2459349593495935
+  },
+  {
+   "threshold": 0.95,
+   "coverage": 0.828006466857356,
+   "accuracy_on_accepted": 0.9911384800240313,
+   "rejected_error_fraction": 0.19595083152566883
+  }
+ ],
+ "low_confidence_handling": {
+  "confident": {
+   "fraction": 0.9573436139783609,
+   "accuracy_at_reported_level": 0.9762275915822292,
+   "fine_grained_accuracy": 0.9762275915822292
+  },
+  "year-uncertain": {
+   "fraction": 0.005223230941425196,
+   "accuracy_at_reported_level": 1.0,
+   "fine_grained_accuracy": 0.7380952380952381
+  },
+  "model-uncertain": {
+   "fraction": 0.026737967914438502,
+   "accuracy_at_reported_level": 0.986046511627907,
+   "fine_grained_accuracy": 0.5720930232558139
+  },
+  "low-confidence": {
+   "fraction": 0.0106951871657754,
+   "accuracy_at_reported_level": null,
+   "fine_grained_accuracy": 0.4883720930232558
+  }
+ },
+ "natural_variation": {
+  "crop brightness": [
+   {
+    "bin": "(14.593, 90.85]",
+    "classical": 0.12430080795525171,
+    "deep": 0.944686140459913,
+    "hybrid": 0.9577377252952144
+   },
+   {
+    "bin": "(90.85, 103.093]",
+    "classical": 0.15547263681592038,
+    "deep": 0.945273631840796,
+    "hybrid": 0.9626865671641791
+   },
+   {
+    "bin": "(103.093, 112.948]",
+    "classical": 0.15049751243781095,
+    "deep": 0.9477611940298507,
+    "hybrid": 0.9601990049751243
+   },
+   {
+    "bin": "(112.948, 125.944]",
+    "classical": 0.15485074626865672,
+    "deep": 0.9508706467661692,
+    "hybrid": 0.9601990049751243
+   },
+   {
+    "bin": "(125.944, 215.004]",
+    "classical": 0.14116915422885573,
+    "deep": 0.9371890547263682,
+    "hybrid": 0.9539800995024875
+   }
+  ],
+  "vehicle size (sqrt box area, px)": [
+   {
+    "bin": "(46.475, 212.688]",
+    "classical": 0.15226848974518334,
+    "deep": 0.9415786202610317,
+    "hybrid": 0.9602237414543194
+   },
+   {
+    "bin": "(212.688, 325.555]",
+    "classical": 0.1424129353233831,
+    "deep": 0.9440298507462687,
+    "hybrid": 0.9539800995024875
+   },
+   {
+    "bin": "(325.555, 408.551]",
+    "classical": 0.1449004975124378,
+    "deep": 0.9353233830845771,
+    "hybrid": 0.9595771144278606
+   },
+   {
+    "bin": "(408.551, 543.03]",
+    "classical": 0.15360696517412936,
+    "deep": 0.9465174129353234,
+    "hybrid": 0.957089552238806
+   },
+   {
+    "bin": "(543.03, 4739.098]",
+    "classical": 0.13308457711442787,
+    "deep": 0.9583333333333334,
+    "hybrid": 0.9639303482587065
+   }
+  ]
+ },
+ "error_breakdown": {
+  "n_errors": 330,
+  "same_make_model_diff_year": 0.11818181818181818,
+  "same_make_diff_model": 0.6636363636363637,
+  "different_make": 0.21818181818181814,
+  "top_confusions": [
+   {
+    "true": "Audi TTS Coupe 2012",
+    "pred": "Audi TT Hatchback 2011",
+    "count": 17
+   },
+   {
+    "true": "Dodge Caliber Wagon 2012",
+    "pred": "Dodge Caliber Wagon 2007",
+    "count": 13
+   },
+   {
+    "true": "Chevrolet Express Van 2007",
+    "pred": "Chevrolet Express Cargo Van 2007",
+    "count": 13
+   },
+   {
+    "true": "Audi S5 Coupe 2012",
+    "pred": "Audi A5 Coupe 2012",
+    "count": 12
+   },
+   {
+    "true": "Chevrolet Express Cargo Van 2007",
+    "pred": "Chevrolet Express Van 2007",
+    "count": 10
+   },
+   {
+    "true": "Chevrolet Silverado 1500 Regular Cab 2012",
+    "pred": "Chevrolet Silverado 2500HD Regular Cab 2012",
+    "count": 9
+   },
+   {
+    "true": "Bentley Continental GT Coupe 2012",
+    "pred": "Bentley Continental GT Coupe 2007",
+    "count": 9
+   },
+   {
+    "true": "Dodge Caliber Wagon 2007",
+    "pred": "Dodge Caliber Wagon 2012",
+    "count": 9
+   },
+   {
+    "true": "Audi V8 Sedan 1994",
+    "pred": "Audi 100 Sedan 1994",
+    "count": 8
+   },
+   {
+    "true": "Mercedes-Benz Sprinter Van 2012",
+    "pred": "Dodge Sprinter Cargo Van 2009",
+    "count": 8
+   },
+   {
+    "true": "BMW 6 Series Convertible 2007",
+    "pred": "BMW M6 Convertible 2010",
+    "count": 6
+   },
+   {
+    "true": "Chevrolet Express Van 2007",
+    "pred": "GMC Savana Van 2012",
+    "count": 6
+   },
+   {
+    "true": "Suzuki SX4 Sedan 2012",
+    "pred": "Suzuki Aerio Sedan 2007",
+    "count": 6
+   },
+   {
+    "true": "Bugatti Veyron 16.4 Convertible 2009",
+    "pred": "Bugatti Veyron 16.4 Coupe 2009",
+    "count": 6
+   },
+   {
+    "true": "Bentley Continental GT Coupe 2007",
+    "pred": "Bentley Continental GT Coupe 2012",
+    "count": 5
+   }
+  ]
+ },
+ "worst_classes": [
+  {
+   "cls": "Chevrolet Express Van 2007",
+   "acc": 0.45714285714285713
+  },
+  {
+   "cls": "Chevrolet Express Cargo Van 2007",
+   "acc": 0.5517241379310345
+  },
+  {
+   "cls": "Audi TTS Coupe 2012",
+   "acc": 0.5714285714285714
+  },
+  {
+   "cls": "Dodge Caliber Wagon 2012",
+   "acc": 0.675
+  },
+  {
+   "cls": "Audi S5 Coupe 2012",
+   "acc": 0.7142857142857143
+  },
+  {
+   "cls": "Bentley Continental GT Coupe 2012",
+   "acc": 0.7352941176470589
+  },
+  {
+   "cls": "Chevrolet Silverado 1500 Regular Cab 2012",
+   "acc": 0.7727272727272727
+  },
+  {
+   "cls": "Dodge Caliber Wagon 2007",
+   "acc": 0.7857142857142857
+  },
+  {
+   "cls": "Mercedes-Benz Sprinter Van 2012",
+   "acc": 0.8048780487804879
+  },
+  {
+   "cls": "Bugatti Veyron 16.4 Convertible 2009",
+   "acc": 0.8125
+  }
+ ],
+ "failure_cases": {
+  "1_wrong_year_same_model": [
+   {
+    "uid": "test_00211",
+    "true": "Bentley Continental GT Coupe 2007",
+    "pred": "Bentley Continental GT Coupe 2012",
+    "conf": 0.8421563506126404,
+    "iou": 0.9478439153439153,
+    "brightness": 125.49759030032467,
+    "box_px": 462.63592597203257
+   },
+   {
+    "uid": "test_00609",
+    "true": "Bentley Continental GT Coupe 2012",
+    "pred": "Bentley Continental GT Coupe 2007",
+    "conf": 0.7623887062072754,
+    "iou": 0.9722222222222222,
+    "brightness": 96.72150297619048,
+    "box_px": 100.024996875781
+   },
+   {
+    "uid": "test_00698",
+    "true": "Dodge Caliber Wagon 2012",
+    "pred": "Dodge Caliber Wagon 2007",
+    "conf": 0.6359014511108398,
+    "iou": 0.9403163631529975,
+    "brightness": 135.14765535097814,
+    "box_px": 190.4704701521997
+   },
+   {
+    "uid": "test_00966",
+    "true": "Honda Odyssey Minivan 2012",
+    "pred": "Honda Odyssey Minivan 2007",
+    "conf": 0.5573391914367676,
+    "iou": 0.957324606081623,
+    "brightness": 70.7429738785558,
+    "box_px": 669.3720938312263
+   }
+  ],
+  "2_confident_but_wrong": [
+   {
+    "uid": "test_06881",
+    "true": "Rolls-Royce Phantom Sedan 2012",
+    "pred": "Rolls-Royce Ghost Sedan 2012",
+    "conf": 0.9997029304504395,
+    "iou": 0.8801360234560133,
+    "brightness": 100.0245359107546,
+    "box_px": 269.0724809414742
+   },
+   {
+    "uid": "test_06149",
+    "true": "Rolls-Royce Phantom Sedan 2012",
+    "pred": "Rolls-Royce Ghost Sedan 2012",
+    "conf": 0.9993463754653931,
+    "iou": 0.9589455157636976,
+    "brightness": 139.14687015517657,
+    "box_px": 315.62002471326184
+   },
+   {
+    "uid": "test_02084",
+    "true": "GMC Yukon Hybrid SUV 2012",
+    "pred": "GMC Terrain SUV 2012",
+    "conf": 0.999333381652832,
+    "iou": 0.9587103141964138,
+    "brightness": 66.8702861952862,
+    "box_px": 268.3412007128238
+   },
+   {
+    "uid": "test_07654",
+    "true": "Jeep Compass SUV 2012",
+    "pred": "Jeep Grand Cherokee SUV 2012",
+    "conf": 0.9993021488189697,
+    "iou": 0.9854192333927315,
+    "brightness": 109.09096666382834,
+    "box_px": 1221.615324068915
+   }
+  ],
+  "3_localisation_failure": [
+   {
+    "uid": "test_00760",
+    "true": "Lamborghini Aventador Coupe 2012",
+    "pred": "Lamborghini Aventador Coupe 2012",
+    "conf": 0.6643044352531433,
+    "iou": 0.0683338642879898,
+    "brightness": 83.23179324894515,
+    "box_px": 53.665631459994955
+   },
+   {
+    "uid": "test_01431",
+    "true": "Ford GT Coupe 2006",
+    "pred": "Ford GT Coupe 2006",
+    "conf": 0.9989005327224731,
+    "iou": 0.07048066429844928,
+    "brightness": 89.67542530665888,
+    "box_px": 790.9930467456714
+   },
+   {
+    "uid": "test_04104",
+    "true": "Nissan NV Passenger Van 2012",
+    "pred": "Nissan NV Passenger Van 2012",
+    "conf": 0.9993691444396973,
+    "iou": 0.2242021950784426,
+    "brightness": 73.45693150991414,
+    "box_px": 268.33561075638096
+   },
+   {
+    "uid": "test_02277",
+    "true": "Nissan NV Passenger Van 2012",
+    "pred": "Nissan NV Passenger Van 2012",
+    "conf": 0.9996957182884216,
+    "iou": 0.23466009456214765,
+    "brightness": 111.03952376602417,
+    "box_px": 252.70140482395422
+   }
+  ],
+  "4_dark_or_low_contrast": [
+   {
+    "uid": "test_04142",
+    "true": "BMW 3 Series Wagon 2012",
+    "pred": "BMW 3 Series Sedan 2012",
+    "conf": 0.709758996963501,
+    "iou": 0.823683088811583,
+    "brightness": 28.12864766725352,
+    "box_px": 609.4784655752818
+   },
+   {
+    "uid": "test_07940",
+    "true": "Aston Martin V8 Vantage Coupe 2012",
+    "pred": "Aston Martin Virage Coupe 2012",
+    "conf": 0.8872698545455933,
+    "iou": 0.9943714821763602,
+    "brightness": 47.13777154972119,
+    "box_px": 384.2108795960885
+   },
+   {
+    "uid": "test_07738",
+    "true": "Bugatti Veyron 16.4 Coupe 2009",
+    "pred": "Bugatti Veyron 16.4 Convertible 2009",
+    "conf": 0.6012156009674072,
+    "iou": 0.9340630893827891,
+    "brightness": 50.29303845187233,
+    "box_px": 159.54936540143305
+   },
+   {
+    "uid": "test_02832",
+    "true": "Dodge Journey SUV 2012",
+    "pred": "Chrysler Town and Country Minivan 2012",
+    "conf": 0.6087883710861206,
+    "iou": 0.9725370863446178,
+    "brightness": 53.49007672365471,
+    "box_px": 356.4575711076986
+   }
+  ],
+  "5_small_low_resolution": [
+   {
+    "uid": "test_04858",
+    "true": "Audi V8 Sedan 1994",
+    "pred": "Audi 100 Sedan 1994",
+    "conf": 0.9333803653717041,
+    "iou": 0.9222919937205651,
+    "brightness": 110.68815789473685,
+    "box_px": 82.78888814327681
+   },
+   {
+    "uid": "test_03061",
+    "true": "Hyundai Accent Sedan 2012",
+    "pred": "Infiniti G Coupe IPL 2012",
+    "conf": 0.48637253046035767,
+    "iou": 0.9095283926852743,
+    "brightness": 88.315723873442,
+    "box_px": 89.44830909525345
+   },
+   {
+    "uid": "test_01583",
+    "true": "Audi V8 Sedan 1994",
+    "pred": "Audi 100 Sedan 1994",
+    "conf": 0.9777248501777649,
+    "iou": 0.9141617914060924,
+    "brightness": 101.84825757575757,
+    "box_px": 94.29740187301027
+   },
+   {
+    "uid": "test_07734",
+    "true": "Audi 100 Wagon 1994",
+    "pred": "Daewoo Nubira Wagon 2002",
+    "conf": 0.7912495136260986,
+    "iou": 0.9491131142774062,
+    "brightness": 129.3032072368421,
+    "box_px": 99.72462083156798
+   }
+  ]
+ },
+ "robustness": [
+  {
+   "condition": "original",
+   "n": 1000,
+   "hybrid_top1": 0.948,
+   "hybrid_iou": 0.9466718059072926,
+   "deep_top1": 0.947,
+   "deep_iou": 0.9466718059072926,
+   "classical_top1": 0.05,
+   "classical_iou": 0.6519539020793677,
+   "gate_rejected": 0.003
+  },
+  {
+   "condition": "dark",
+   "n": 1000,
+   "hybrid_top1": 0.95,
+   "hybrid_iou": 0.9406779709851292,
+   "deep_top1": 0.941,
+   "deep_iou": 0.9406779709851292,
+   "classical_top1": 0.044,
+   "classical_iou": 0.6373879229520102,
+   "gate_rejected": 0.001
+  },
+  {
+   "condition": "very_dark_noisy",
+   "n": 1000,
+   "hybrid_top1": 0.93,
+   "hybrid_iou": 0.9231723258776199,
+   "deep_top1": 0.897,
+   "deep_iou": 0.9231723258776199,
+   "classical_top1": 0.026,
+   "classical_iou": 0.6324136674560403,
+   "gate_rejected": 0.001
+  },
+  {
+   "condition": "overexposed",
+   "n": 1000,
+   "hybrid_top1": 0.938,
+   "hybrid_iou": 0.9406680814040225,
+   "deep_top1": 0.934,
+   "deep_iou": 0.9406680814040225,
+   "classical_top1": 0.043,
+   "classical_iou": 0.6138066550152417,
+   "gate_rejected": 0.002
+  },
+  {
+   "condition": "low_res_x4",
+   "n": 1000,
+   "hybrid_top1": 0.935,
+   "hybrid_iou": 0.9357890253509227,
+   "deep_top1": 0.907,
+   "deep_iou": 0.9357890253509227,
+   "classical_top1": 0.023,
+   "classical_iou": 0.545289393733007,
+   "gate_rejected": 0.003
+  },
+  {
+   "condition": "low_res_x8",
+   "n": 1000,
+   "hybrid_top1": 0.827,
+   "hybrid_iou": 0.8970708017309582,
+   "deep_top1": 0.758,
+   "deep_iou": 0.8970708017309582,
+   "classical_top1": 0.025,
+   "classical_iou": 0.368879264683949,
+   "gate_rejected": 0.005
+  },
+  {
+   "condition": "occlusion_30pct",
+   "n": 1000,
+   "hybrid_top1": 0.875,
+   "hybrid_iou": 0.927407709234831,
+   "deep_top1": 0.887,
+   "deep_iou": 0.927407709234831,
+   "classical_top1": 0.018,
+   "classical_iou": 0.6567595735259079,
+   "gate_rejected": 0.002
+  },
+  {
+   "condition": "gaussian_noise",
+   "n": 1000,
+   "hybrid_top1": 0.945,
+   "hybrid_iou": 0.9268579161144215,
+   "deep_top1": 0.932,
+   "deep_iou": 0.9268579161144215,
+   "classical_top1": 0.037,
+   "classical_iou": 0.6338544031168974,
+   "gate_rejected": 0.003
+  },
+  {
+   "condition": "motion_blur",
+   "n": 1000,
+   "hybrid_top1": 0.905,
+   "hybrid_iou": 0.9198875005699984,
+   "deep_top1": 0.894,
+   "deep_iou": 0.9198875005699984,
+   "classical_top1": 0.025,
+   "classical_iou": 0.45969062662991,
+   "gate_rejected": 0.002
+  },
+  {
+   "condition": "rotation_15deg",
+   "n": 1000,
+   "hybrid_top1": 0.948,
+   "hybrid_iou": 0.8157193622112479,
+   "deep_top1": 0.924,
+   "deep_iou": 0.8157193622112479,
+   "classical_top1": 0.017,
+   "classical_iou": 0.6169217509987892,
+   "gate_rejected": 0.001
+  },
+  {
+   "condition": "perspective_view",
+   "n": 1000,
+   "hybrid_top1": 0.952,
+   "hybrid_iou": 0.7959104604291078,
+   "deep_top1": 0.942,
+   "deep_iou": 0.7959104604291078,
+   "classical_top1": 0.037,
+   "classical_iou": 0.6354301010036154,
+   "gate_rejected": 0.002
+  }
+ ]
+}
