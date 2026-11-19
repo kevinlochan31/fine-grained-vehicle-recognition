@@ -114,6 +114,17 @@ never reached 95% precision in tuning, so it stays effectively off (threshold 0.
 
 When the layer names a generation it is right **98.2%** of the time (make 98.8%); it does so for 63.7% of photos.
 
+**Teach AutoLens your own car photos.** Under every result there is a "Teach AutoLens" panel: pick make →
+model → generation from the catalogue, add a few photos (the current one is included) and press Teach.
+Only that car's row of the probe is (re)trained, about 1 s on the GPU, with the same recipe and temperature
+as the tuned probe. A car already in the gallery continues from its tuned row; every other row stays
+exactly as tuned. Taught photos and state are stored in `~/cvh/world_cars/user_teach/` (outside the
+repository, never committed) and can be removed again from the panel (`/api/teach`, `/api/taught`).
+Answers learnt this way say "matched from your photos". Simulation (`python -m scripts.eval_world teach`):
+30 gallery models were removed and taught back from their own reference photos. With 3 photos, 36.7% of
+their unseen test photos were then named with the right generation at the live 0.95 threshold; with 5
+photos, 43.3%. Only 0.02–0.03% of other cars' photos were wrongly named as the taught car.
+
 **Stanford Cars safety checks:** hybrid still **95.90% top-1 / 99.75% top-5** on the 8,041 test images
 (the models are untouched). Known cars wrongly re-routed to the open-set path stay at **0.796%**: the world
 layer adds 0.0%, because its override threshold leaves 0 of 788 Stanford val cars answered as a world car.

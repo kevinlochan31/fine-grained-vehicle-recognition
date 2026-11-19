@@ -161,6 +161,25 @@
                 <small id="r-world-credit"></small>
               </figcaption>
             </figure>
+            <details class="teach" id="teach">
+              <summary><span class="mono strip__title">TEACH AUTOLENS</span><b>Wrong, or not named? Teach it this car.</b></summary>
+              <form id="teach-form" autocomplete="off">
+                <p class="teach__hint">Pick the car, add 3–10 clear photos of it from different angles (this photo is included). Only this car's entry is retrained; your photos stay on this computer.</p>
+                <div class="teach__row">
+                  <label>Make<input name="make" id="teach-make" list="dl-make" placeholder="e.g. Maruti Suzuki" required></label>
+                  <label>Model<input name="model" id="teach-model" list="dl-model" placeholder="e.g. Grand Vitara" required></label>
+                  <label>Generation<select name="y0" id="teach-gen"><option value="">Not sure</option></select></label>
+                </div>
+                <div class="teach__row">
+                  <label class="teach__files">More photos<input type="file" id="teach-files" accept="image/*" multiple></label>
+                  <label class="teach__check"><input type="checkbox" id="teach-current" checked> include the photo above</label>
+                  <button class="btn btn--lime btn--sm" type="submit" id="teach-go">Teach</button>
+                </div>
+                <p class="teach__msg mono" id="teach-msg" role="status"></p>
+                <ul class="teach__list" id="teach-list"></ul>
+              </form>
+              <datalist id="dl-make"></datalist><datalist id="dl-model"></datalist>
+            </details>
             <div class="top5" id="top5-wrap">
               <p class="mono strip__title" id="top5-title">TOP-5 CANDIDATES · HYBRID</p>
               <ol id="r-top5"></ol>

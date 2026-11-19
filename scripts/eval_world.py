@@ -429,6 +429,9 @@ def build(name="b16"):
     meta = dict(backbone=" ".join(BACKBONES[name]), arch=BACKBONES[name][0], pretrained=BACKBONES[name][1], name=name,
                 n_world=K, classes=[{k: c[k] for k in ("key", "make", "model", "gen", "years", "y0", "y1")} for c in wcls],
                 stanford_classes=NAMES, method="linear probe over world reference photos + Stanford train (196 classes)")
+    # training set of the probe (for teaching new cars at run time; stays in WORK_DIR, not in the repo)
+    np.savez_compressed(W / f"probe_train_{name}.npz", X=np.concatenate([Xr_all, Xs_tr]).astype(np.float16),
+                        y=np.concatenate([yr, ys_tr]).astype(np.int32), T=np.float32(T))
     np.savez_compressed(C.MODELS_DIR / "world_gallery.npz", W=Wt.astype(np.float16), b=b.astype(np.float32),
                         ref_emb=Xr_all.astype(np.float16), ref_cls=yr.astype(np.int16), meta=json.dumps(meta))
     for old in C.MODELS_DIR.glob("world_text_*.npz"):
@@ -460,6 +463,56 @@ def build(name="b16"):
                      stanford_test=stanford_test)
     OUT.write_text(json.dumps(R, indent=1))
     print(json.dumps({k: v for k, v in R["live"].items() if k != "tuning"}, indent=1))
+
+
+# ---------------------------------------------------------------------------------------------------- teach
+def teach_sim(n_models=30, shots=(3, 5)):
+    """Simulate a user teaching a car the gallery does not know: the model is removed (its row disabled, its
+    reference photos and training rows dropped), then taught back from `shots` of its reference photos with
+    WorldCars.teach. Measured on its held-out test photos (named with the right generation at the live
+    threshold) and on all OTHER test photos (now wrongly named as the taught car)."""
+    from src.worldcars import WorldCars
+    df, wcls = load_world()
+    cfg = json.loads((C.MODELS_DIR / "hybrid_config.json").read_text())
+    F = dict(np.load(W / "feats_siglip.npz", allow_pickle=True))
+    Xn = norm(F["world_crop"] + F["world_full"])
+    ref, test = (df.set == "ref").values, (df.set == "test").values
+    rng = np.random.default_rng(0)
+    eligible = [k for k in range(len(wcls)) if (df[ref].cls == k).sum() >= max(shots) and (df[test].cls == k).sum() >= 1]
+    picks = rng.choice(eligible, size=min(n_models, len(eligible)), replace=False)
+    base = WorldCars(device="cuda", _skip_replay=True)
+    R = {}
+    for n in shots:
+        hit = tot = false_named = others = 0
+        for m in picks:
+            wc = WorldCars.__new__(WorldCars); wc.__dict__.update({k: (v.copy() if isinstance(v, np.ndarray) else
+                                                                     list(v) if isinstance(v, list) else v)
+                                                                 for k, v in base.__dict__.items()})
+            wc.taught = []
+            wc.classes = [dict(c) for c in wc.classes]
+            wc.classes[m]["user"] = True                     # treat as a brand-new car: no tuned row to start from
+            keep = wc.train_y != m
+            wc.train_X, wc.train_y = wc.train_X[keep], wc.train_y[keep]
+            keep_r = wc.ref_cls != m
+            wc.ref_emb, wc.ref_cls = wc.ref_emb[keep_r], wc.ref_cls[keep_r]
+            wc.refs = [r for r, k in zip(wc.refs, keep_r) if k]
+            c = wcls[m]
+            shots_X = Xn[ref & (df.cls == m).values][:n]
+            wc.teach(c["make"], c["model"], c["gen"], c["years"], c["y0"], c["y1"], list(shots_X),
+                     [f"sim_{i}.jpg" for i in range(n)], save=False)
+            for i in np.where(test)[0]:
+                r = wc.match(Xn[i])
+                named = r["top_is_world"] and r["p"] >= cfg["world_name_conf"]
+                if df.cls[i] == m:
+                    tot += 1; hit += named and judge(r["cls"], c)[2]
+                else:
+                    others += 1; false_named += named and r["cls"].get("key") == wc.classes[m].get("key") and judge(r["cls"], wcls[df.cls[i]])[1] is False
+        R[f"{n}_photos"] = dict(models=len(picks), taught_car_test_photos=tot, named_right_generation=hit / tot,
+                                other_photos_wrongly_named_as_taught_car=false_named / others)
+        print(n, R[f"{n}_photos"], flush=True)
+    out = json.loads(OUT.read_text()) if OUT.exists() else {}
+    out["teach_simulation"] = R
+    OUT.write_text(json.dumps(out, indent=1))
 
 
 # ---------------------------------------------------------------------------------------------------- e2e
@@ -532,7 +585,7 @@ def e2e():
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("stage", choices=["compare", "build", "e2e"])
+    ap.add_argument("stage", choices=["compare", "build", "e2e", "teach"])
     ap.add_argument("--backbone", default="b16", choices=list(BACKBONES))
     a = ap.parse_args()
-    build(a.backbone) if a.stage == "build" else {"compare": compare, "e2e": e2e}[a.stage]()
+    build(a.backbone) if a.stage == "build" else {"compare": compare, "e2e": e2e, "teach": teach_sim}[a.stage]()

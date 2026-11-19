@@ -426,9 +426,78 @@
     countUp($("#r-conf"), r.car_probability * 100, (v) => v.toFixed(1), 0.9);
     $("#r-facts").innerHTML = [["Vehicle score (CLIP)", pct(r.car_probability)], ["Latency", `${Math.round(r.timings.total_ms)} ms`]]
       .map(([k, v]) => `<div class="fact"><span>${k}</span><b>${esc(v)}</b></div>`).join("");
-    $("#top5-wrap").hidden = true; $("#r-world").hidden = true;
+    $("#top5-wrap").hidden = true; $("#r-world").hidden = true; $("#teach").hidden = true;
     anim([...res.children], { opacity: [0, 1], y: [20, 0] }, { duration: 0.5, delay: stagger(0.1), ease: EASE });
   }
+  /* teach AutoLens: add your own photos of a car (only that car's entry is retrained) */
+  let CAT = null;
+  async function loadCatalogue() {
+    if (CAT) return CAT;
+    try { CAT = await (await fetch("/api/catalogue")).json(); } catch { CAT = { can_teach: false, makes: {} }; }
+    $("#dl-make").innerHTML = Object.keys(CAT.makes).sort().map((m) => `<option value="${esc(m)}">`).join("");
+    if (!CAT.can_teach) { $("#teach-msg").textContent = "Teaching is not available on this server."; $("#teach-go").disabled = true; }
+    return CAT;
+  }
+  function fillModels() {
+    const ms = (CAT && CAT.makes[$("#teach-make").value]) || {};
+    $("#dl-model").innerHTML = Object.keys(ms).sort().map((m) => `<option value="${esc(m)}">`).join("");
+    fillGens();
+  }
+  function fillGens() {
+    const gens = ((CAT && CAT.makes[$("#teach-make").value]) || {})[$("#teach-model").value] || [];
+    $("#teach-gen").innerHTML = `<option value="">Not sure</option>` + gens.filter((g) => g[2])
+      .map((g) => `<option value="${g[2]}">${esc(g[0] ? `${g[0]} · ${g[1]}` : g[1])}</option>`).join("");
+    if (gens.filter((g) => g[2]).length === 1) $("#teach-gen").selectedIndex = 1;
+  }
+  async function loadTaught() {
+    try {
+      const L = await (await fetch("/api/taught")).json();
+      $("#teach-list").innerHTML = L.map((t) => `<li><span>Taught: <b>${esc(t.make)} ${esc(t.model)}</b>${t.gen ? ` · ${esc(t.gen)} (${esc(t.years)})` : ""} · ${t.photos} photo${t.photos > 1 ? "s" : ""}</span><button type="button" data-i="${t.index}" aria-label="Remove ${esc(t.make)} ${esc(t.model)}">REMOVE</button></li>`).join("");
+    } catch { /* list is optional */ }
+  }
+  function prefillTeach(r) {
+    const box = $("#teach"); box.hidden = false;
+    const w = r.world, wk = r.world_make;
+    if (w) { $("#teach-make").value = w.make; $("#teach-model").value = w.model; }
+    else if (wk) { $("#teach-make").value = wk.make; $("#teach-model").value = ""; }
+    else { $("#teach-make").value = ""; $("#teach-model").value = ""; }
+    $("#teach-msg").textContent = ""; $("#teach-msg").className = "teach__msg mono";
+    if (CAT) fillModels();
+  }
+  $("#teach").addEventListener("toggle", async () => { if ($("#teach").open) { await loadCatalogue(); fillModels(); loadTaught(); } });
+  ["change", "input"].forEach((ev) => {
+    $("#teach-make").addEventListener(ev, fillModels);
+    $("#teach-model").addEventListener(ev, fillGens);
+  });
+  $("#teach-list").addEventListener("click", async (e) => {
+    const b = e.target.closest("button[data-i]"); if (!b) return;
+    b.disabled = true;
+    await fetch(`/api/taught/${b.dataset.i}`, { method: "DELETE" }); loadTaught();
+    $("#teach-msg").textContent = "Removed. AutoLens is back to its tuned gallery for that car.";
+  });
+  $("#teach-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = $("#teach-msg"), go = $("#teach-go");
+    const fd = new FormData(); fd.append("make", $("#teach-make").value.trim()); fd.append("model", $("#teach-model").value.trim());
+    fd.append("y0", $("#teach-gen").value);
+    const files = [...$("#teach-files").files];
+    if ($("#teach-current").checked && lastFile) files.unshift(lastFile);
+    if (!files.length) { msg.className = "teach__msg mono is-err"; msg.textContent = "Add at least one photo."; return; }
+    files.slice(0, 20).forEach((f) => fd.append("files", f));
+    go.disabled = true; msg.className = "teach__msg mono"; msg.textContent = `TEACHING · ${files.length} PHOTO${files.length > 1 ? "S" : ""}…`;
+    try {
+      const res = await fetch("/api/teach", { method: "POST", body: fd });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.detail || "Teaching failed.");
+      msg.className = "teach__msg mono is-ok";
+      msg.textContent = (`Learnt ${j.make} ${j.model}${j.gen ? ` · ${j.gen}` : ""} from ${j.photos_added} photo${j.photos_added > 1 ? "s" : ""}` +
+        ` · ${j.references} references now${j.skipped ? ` · ${j.skipped} skipped (no car found)` : ""}`).toUpperCase();
+      $("#teach-files").value = ""; loadTaught();
+      if (lastFile) setTimeout(() => analyse(lastFile), 900);       // show the new answer for the current photo
+    } catch (err) { msg.className = "teach__msg mono is-err"; msg.textContent = err.message; }
+    finally { go.disabled = false; }
+  });
+
   /* world-car layer: closest reference photo (Wikimedia Commons) with its credit */
   function renderWorld(r) {
     const box = $("#r-world"), w = r.world;
@@ -438,10 +507,15 @@
     $("#r-world-name").textContent = `${w.make} ${w.model}${gen}`;
     const img = $("#r-world-img"), link = $("#r-world-link"), ref = w.ref;
     if (ref) {
-      img.src = `/${ref.image}`; img.alt = `Reference photo: ${w.make} ${w.model}`; link.href = ref.source; link.hidden = false;
-      $("#r-world-meta").textContent = `MATCHED FROM REFERENCE PHOTOS · ${pct(w.p)} · SIMILARITY ${(w.ref_similarity || 0).toFixed(2)}`;
-      const lic = ref.license_url ? `<a href="${esc(ref.license_url)}" target="_blank" rel="noopener">${esc(ref.license)}</a>` : esc(ref.license || "free licence");
-      $("#r-world-credit").innerHTML = `Photo: ${esc(ref.author || "unknown")} · ${lic} · via <a href="${esc(ref.source)}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
+      img.src = `/${ref.image}`; img.alt = `Reference photo: ${w.make} ${w.model}`; link.hidden = false;
+      if (ref.source) link.href = ref.source; else link.removeAttribute("href");
+      $("#r-world-meta").textContent = `MATCHED FROM ${(w.source || "reference photos").toUpperCase()} · ${pct(w.p)} · SIMILARITY ${(w.ref_similarity || 0).toFixed(2)}`;
+      if (!ref.source) {
+        $("#r-world-credit").textContent = "Your photo, taught in AutoLens (stored only on this computer).";
+      } else {
+        const lic = ref.license_url ? `<a href="${esc(ref.license_url)}" target="_blank" rel="noopener">${esc(ref.license)}</a>` : esc(ref.license || "free licence");
+        $("#r-world-credit").innerHTML = `Photo: ${esc(ref.author || "unknown")} · ${lic} · via <a href="${esc(ref.source)}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
+      }
     } else {
       link.hidden = true; img.removeAttribute("src");
       $("#r-world-meta").textContent = `ZERO-SHOT FROM THE WORLD CATALOGUE · ${pct(w.p)} · NO REFERENCE PHOTO FOR THIS MODEL`;
@@ -548,6 +622,7 @@
     else if (unk) { mk = r.make || "Make unclear"; md = r.status === "unknown" ? "Unknown car" : "Unknown model"; yr = "YEAR N/A"; }
     else if (world) { mk = r.world.make; md = r.world.model + (r.world.gen ? ` · ${r.world.gen}` : ""); yr = r.world.years || "GEN ?"; }
     renderWorld(world ? r : {});
+    prefillTeach(r);
     drawTarget(d, r, st);
     $("#latency-hint").textContent = `${Math.round(r.timings.total_ms)} MS · ${r.det_source.toUpperCase()}`;
 
@@ -585,7 +660,7 @@
     anim($("#gauge-tick"), { rotate: [0, 360 * r.confidence] }, { duration: 1.2, ease: EASE, delay: 0.3 });
     setTimeout(() => countUp($("#r-conf"), r.confidence * 100, (v) => v.toFixed(1), 1.2), 300);
     $("#r-facts").innerHTML = [
-      world ? ["In training set", `No · world layer (${r.world.ref ? "reference photos" : "zero-shot"})`]
+      world ? ["In training set", `No · world layer (${r.world.ref ? (r.world.source || "reference photos") : "zero-shot"})`]
       : open ? ["In training set", "No · open-vocabulary"]
         : unk ? ["Closest trained class", r.closest_trained_class || "-"]
         : ["Make-level", `${r.best_make} · ${pct(r.make_confidence)}`],

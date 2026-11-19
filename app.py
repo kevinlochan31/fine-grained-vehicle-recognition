@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor
 import cv2
 import numpy as np
 import uvicorn
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -148,6 +148,90 @@ def performance():
     }
 
 
+# ---------------------------------------------------------------------------- teach AutoLens your own car photos
+_CATALOGUE = None
+
+
+@app.get("/api/catalogue")
+def catalogue():
+    """World catalogue for the teach form: {make: {model: [[gen, years, y0, y1], ...]}}."""
+    global _CATALOGUE
+    if _CATALOGUE is None:
+        from src.worldcars import load_world_catalogue
+        out = {}
+        for e in load_world_catalogue():
+            out.setdefault(e["make"], {}).setdefault(e["model"], []).append([e["gen"], e["years_label"], e["years"][0], e["years"][1]])
+        _CATALOGUE = out
+    return {"can_teach": bool(REC.world is not None and REC.world.can_teach), "makes": _CATALOGUE}
+
+
+@app.post("/api/teach")
+async def teach(make: str = Form(...), model: str = Form(...), y0: str = Form(""), files: list[UploadFile] = File(...)):
+    W = REC.world
+    if W is None or not W.can_teach:
+        raise HTTPException(503, "Teaching is not available (world-car layer or its training set is missing).")
+    make, model = make.strip(), model.strip()
+    if not make or not model:
+        raise HTTPException(422, "Please give the make and the model.")
+    if not 1 <= len(files) <= 20:
+        raise HTTPException(422, "Add between 1 and 20 photos.")
+    datas = [await f.read() for f in files]
+    if any(len(d) > MAX_BYTES or not d for d in datas):
+        raise HTTPException(413, "Each photo must be a non-empty image up to 15 MB.")
+    try:
+        return await asyncio.wrap_future(EXECUTOR.submit(_teach, make, model, y0, datas))
+    except InputError as e:
+        raise HTTPException(422, str(e))
+
+
+def _teach(make, model, y0, datas):
+    import uuid
+    from src.data import crop_image
+    from src.worldcars import USER_DIR, load_world_catalogue
+    y0 = int(y0) if str(y0).strip().isdigit() else None
+    e = next((e for e in load_world_catalogue() if e["make"] == make and e["model"] == model and e["years"][0] == y0), None)
+    gen, years, y1 = (e["gen"], e["years_label"], e["years"][1]) if e else (None, "", None)
+    (USER_DIR / "images").mkdir(parents=True, exist_ok=True)
+    feats, names, skipped = [], [], 0
+    for d in datas:
+        arr = cv2.imdecode(np.frombuffer(d, np.uint8), cv2.IMREAD_COLOR)
+        if arr is None:
+            skipped += 1; continue
+        rgb = validate_image(cv2.cvtColor(arr, cv2.COLOR_BGR2RGB))
+        det, _ = REC.detector.primary(rgb)
+        if not det["source"].startswith("yolo"):          # only photos where the car detector finds a car
+            skipped += 1; continue
+        feats.append(REC.world.embed(rgb, crop_image(rgb, det["box"])))
+        name = f"{uuid.uuid4().hex[:12]}.jpg"
+        h, w = rgb.shape[:2]; s = min(1.0, 320 / max(h, w))
+        th = cv2.resize(rgb, (int(w * s), int(h * s)), interpolation=cv2.INTER_AREA)
+        cv2.imwrite(str(USER_DIR / "images" / name), cv2.cvtColor(th, cv2.COLOR_RGB2BGR), [cv2.IMWRITE_JPEG_QUALITY, 85])
+        names.append(name)
+    if not feats:
+        raise InputError("No car was found in these photos. Use clear photos where the whole car is visible.")
+    out = REC.world.teach(make, model, gen, years, y0, y1, feats, names)
+    out["skipped"] = skipped
+    return out
+
+
+@app.get("/api/taught")
+def taught():
+    W = REC.world
+    if W is None:
+        return []
+    return [dict(index=i, make=e["make"], model=e["model"], gen=e["gen"], years=e["years"], photos=len(e["images"]))
+            for i, e in enumerate(W.taught)]
+
+
+@app.delete("/api/taught/{index}")
+async def forget(index: int):
+    W = REC.world
+    if W is None or not 0 <= index < len(W.taught):
+        raise HTTPException(404, "No such taught car.")
+    await asyncio.wrap_future(EXECUTOR.submit(W.forget, index))
+    return taught()
+
+
 @app.get("/api/examples")
 def examples():
     return [f"/examples/{p.name}" for p in sorted((C.PROJECT_ROOT / "examples").glob("*.jpg"))]
@@ -167,6 +251,9 @@ app.mount("/examples", StaticFiles(directory=C.PROJECT_ROOT / "examples"), name=
 app.mount("/docs-assets", StaticFiles(directory=C.PROJECT_ROOT / "docs"), name="docs")
 if (WEB / "world_refs").exists():          # reference photos of the world-car layer (Wikimedia Commons, credited)
     app.mount("/world_refs", StaticFiles(directory=WEB / "world_refs"), name="world_refs")
+from src.worldcars import USER_DIR as _USER_DIR     # photos you taught AutoLens (kept outside the repository)
+(_USER_DIR / "images").mkdir(parents=True, exist_ok=True)
+app.mount("/user_refs", StaticFiles(directory=_USER_DIR / "images"), name="user_refs")
 app.mount("/static", StaticFiles(directory=WEB), name="static")
 
 

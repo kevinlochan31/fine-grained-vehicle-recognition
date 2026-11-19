@@ -332,12 +332,13 @@ class VehicleRecognizer:
         c, r = wm["cls"], wm["ref"]
         label = describe_world(c)
         extra = " · generation not certain" if level == "model" else ""
+        src = "your photos" if (c.get("user") or r.get("user")) else "reference photos"
         pred.update(status="world", label=label, make=c["make"], model=c["model"],
                     year=c.get("years") or ("generation not certain" if level == "model" else "unknown"),
                     confidence=wm["p"], in_training_set=False,
-                    display=f"{label}{extra} · matched from reference photos",
+                    display=f"{label}{extra} · matched from {src}",
                     world=dict(make=c["make"], model=c["model"], gen=c.get("gen"), years=c.get("years"), y0=c.get("y0"),
-                               level=level, source="reference photos", p=wm["p"], ref_similarity=wm["ref_sim"],
+                               level=level, source=src, p=wm["p"], ref_similarity=wm["ref_sim"],
                                ref=dict(image=r["image"], author=r["author"], license=r["license"],
                                         license_url=r["license_url"], source=r["source"], title=r["title"])))
         return pred

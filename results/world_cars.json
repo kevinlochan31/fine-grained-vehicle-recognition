@@ -540,5 +540,19 @@
   "answers_changed": 0.002,
   "confident_and_correct_without_world": 0.934,
   "confident_and_correct_with_world": 0.934
+ },
+ "teach_simulation": {
+  "3_photos": {
+   "models": 30,
+   "taught_car_test_photos": 90,
+   "named_right_generation": 0.36666666666666664,
+   "other_photos_wrongly_named_as_taught_car": 0.00019646365422396856
+  },
+  "5_photos": {
+   "models": 30,
+   "taught_car_test_photos": 90,
+   "named_right_generation": 0.43333333333333335,
+   "other_photos_wrongly_named_as_taught_car": 0.0002619515389652914
+  }
  }
 }

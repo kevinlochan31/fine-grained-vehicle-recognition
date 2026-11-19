@@ -335,6 +335,16 @@ model 7.6%, right make only 13.7%, "unknown car" 12.7%, **wrong 5.1%**. Indian-m
 20.9%, make only 24.2%, unknown 40.0%, **wrong 14.8%**. When a generation is named it is right 98.2% of
 the time.
 
+**Teaching new cars (user's own photos).** `WorldCars.teach` embeds the user's photos (YOLO crop + frame,
+SigLIP) and retrains only that car's probe row against the frozen rows, using the original recipe
+(class-balanced cross-entropy, Adam lr 1e-2, weight decay 1e-4, raw logit space, then the tuned temperature).
+A new car starts from its prototype; a car already in the gallery continues from its tuned row (retraining
+it from scratch made it slightly worse in testing). It takes about 1 s on the GPU. State is replayed at
+start-up from `WORK_DIR/world_cars/user_teach/state.json`, which never enters the repository. Simulated
+on 30 models (removed, then taught back from 3 / 5 of their reference photos): 36.7% / 43.3% of their
+held-out photos named with the right generation at p ≥ 0.95, and 0.02% / 0.03% of all other test photos
+wrongly named as the taught car. With no taught cars, every reported number above is unchanged.
+
 **Stanford safety.** Hybrid 95.90% / 99.75% top-1 / top-5 (unchanged models, recomputed). Known-car
 re-routing on test is 0.796% before and after (+0.0%). On 500 random Stanford test images run end to end,
 0.2% of displayed answers changed and confident-correct stayed at 93.4%.
