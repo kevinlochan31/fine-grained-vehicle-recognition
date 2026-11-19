@@ -395,6 +395,7 @@
     "year-uncertain": { cls: "warn", tone: "is-warn", text: "Year uncertain", icon: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>' },
     "model-uncertain": { cls: "serious", tone: "is-warn", text: "Make only", icon: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>' },
     "low-confidence": { cls: "low", tone: "is-low", text: "Low confidence", icon: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>' },
+    "world": { cls: "cyan", tone: "is-cyan", text: "World car", icon: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>' },
     "open-set": { cls: "cyan", tone: "is-cyan", text: "Unseen model", icon: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>' },
     "unknown-model": { cls: "serious", tone: "is-warn", text: "Unknown model", icon: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>' },
     "unknown": { cls: "low", tone: "is-low", text: "Outside supported classes", icon: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>' },
@@ -425,8 +426,28 @@
     countUp($("#r-conf"), r.car_probability * 100, (v) => v.toFixed(1), 0.9);
     $("#r-facts").innerHTML = [["Vehicle score (CLIP)", pct(r.car_probability)], ["Latency", `${Math.round(r.timings.total_ms)} ms`]]
       .map(([k, v]) => `<div class="fact"><span>${k}</span><b>${esc(v)}</b></div>`).join("");
-    $("#top5-wrap").hidden = true;
+    $("#top5-wrap").hidden = true; $("#r-world").hidden = true;
     anim([...res.children], { opacity: [0, 1], y: [20, 0] }, { duration: 0.5, delay: stagger(0.1), ease: EASE });
+  }
+  /* world-car layer: closest reference photo (Wikimedia Commons) with its credit */
+  function renderWorld(r) {
+    const box = $("#r-world"), w = r.world;
+    if (!w) { box.hidden = true; return; }
+    box.hidden = false;
+    const gen = w.gen ? ` · ${w.gen}${w.years ? ` (${w.years})` : ""}` : "";
+    $("#r-world-name").textContent = `${w.make} ${w.model}${gen}`;
+    const img = $("#r-world-img"), link = $("#r-world-link"), ref = w.ref;
+    if (ref) {
+      img.src = `/${ref.image}`; img.alt = `Reference photo: ${w.make} ${w.model}`; link.href = ref.source; link.hidden = false;
+      $("#r-world-meta").textContent = `MATCHED FROM REFERENCE PHOTOS · ${pct(w.p)} · SIMILARITY ${(w.ref_similarity || 0).toFixed(2)}`;
+      const lic = ref.license_url ? `<a href="${esc(ref.license_url)}" target="_blank" rel="noopener">${esc(ref.license)}</a>` : esc(ref.license || "free licence");
+      $("#r-world-credit").innerHTML = `Photo: ${esc(ref.author || "unknown")} · ${lic} · via <a href="${esc(ref.source)}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
+    } else {
+      link.hidden = true; img.removeAttribute("src");
+      $("#r-world-meta").textContent = `ZERO-SHOT FROM THE WORLD CATALOGUE · ${pct(w.p)} · NO REFERENCE PHOTO FOR THIS MODEL`;
+      $("#r-world-credit").textContent = "Generation not determined: only models with reference photos get a generation.";
+    }
+    box.classList.toggle("is-zeroshot", !ref);
   }
   const icon = (p, w = 14) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 
@@ -513,9 +534,11 @@
     if (d.no_car) { renderNoCar(d); return; }
     const r = d.results.hybrid, st = STATUS[r.status] || STATUS["low-confidence"];
     const open = r.status === "open-set";
+    const world = r.status === "world" && r.world;                 // named by the world-car layer
     const unk = r.status === "unknown" || r.status === "unknown-model";
     const outside = open || (unk && !r.possibly_outside);          // CLIP says: not one of the 196 classes
-    $("#top5-title").textContent = open ? "OPEN-VOCABULARY CANDIDATES · CLIP"
+    $("#top5-title").textContent = world ? "196-CLASS MODEL · CANDIDATES IT REJECTED"
+      : open ? "OPEN-VOCABULARY CANDIDATES · CLIP"
       : unk ? (outside ? "CLOSEST CATALOGUE MATCHES · UNCONFIRMED" : "CLOSEST TRAINED CLASSES · UNCONFIRMED")
       : "TOP-5 CANDIDATES · HYBRID";
     // What the big title shows: never present a guess the system did not commit to.
@@ -523,6 +546,8 @@
     if (r.status === "model-uncertain") { mk = r.best_make; md = "Model uncertain"; yr = "YEAR ?"; }
     else if (r.status === "year-uncertain") { const bm = r.best_makemodel || ""; mk = r.make; md = bm.startsWith(mk) ? bm.slice(mk.length).trim() : r.model; yr = "YEAR ?"; }
     else if (unk) { mk = r.make || "Make unclear"; md = r.status === "unknown" ? "Unknown car" : "Unknown model"; yr = "YEAR N/A"; }
+    else if (world) { mk = r.world.make; md = r.world.model + (r.world.gen ? ` · ${r.world.gen}` : ""); yr = r.world.years || "GEN ?"; }
+    renderWorld(world ? r : {});
     drawTarget(d, r, st);
     $("#latency-hint").textContent = `${Math.round(r.timings.total_ms)} MS · ${r.det_source.toUpperCase()}`;
 
@@ -538,7 +563,11 @@
     const badge = $("#r-badge"); badge.className = `badge badge--${st.cls}`; badge.innerHTML = `${icon(st.icon)}<span>${st.text}</span>`;
     const t = d.thresholds.confidence;
     const guess = r.top5.length ? `${r.top5[0].label} (${pct(r.top5[0].p)})` : "";
-    $("#r-threshold").textContent = open
+    $("#r-threshold").textContent = world
+      ? (r.world.ref
+        ? `Not one of the 196 Stanford training classes. The separate world-car layer matched it to reference photos (${pct(r.confidence)} sure). Closest trained class: ${r.closest_trained_class}.`
+        : `Not one of the 196 Stanford training classes. The world-car layer named the model zero-shot from its ~2,000-model catalogue (${pct(r.confidence)} sure); with no reference photo it does not claim a generation.`)
+      : open
       ? `Not one of the 196 training classes, so it was named open-vocabulary by CLIP from ~950 catalogued models. Closest trained class: ${r.closest_trained_class}.`
       : r.status === "unknown-model"
         ? `${outside ? "This car does not match any of the 196 supported classes" : "The classifier is not sure this is one of the 196 supported classes"}, so it reports the make only (${pct(r.confidence)} sure) instead of guessing a model. Best unconfirmed guess: ${guess}.`
@@ -554,7 +583,8 @@
     anim($("#gauge-tick"), { rotate: [0, 360 * r.confidence] }, { duration: 1.2, ease: EASE, delay: 0.3 });
     setTimeout(() => countUp($("#r-conf"), r.confidence * 100, (v) => v.toFixed(1), 1.2), 300);
     $("#r-facts").innerHTML = [
-      open ? ["In training set", "No · open-vocabulary"]
+      world ? ["In training set", `No · world layer (${r.world.ref ? "reference photos" : "zero-shot"})`]
+      : open ? ["In training set", "No · open-vocabulary"]
         : unk ? ["Closest trained class", r.closest_trained_class || "-"]
         : ["Make-level", `${r.best_make} · ${pct(r.make_confidence)}`],
       ["Vehicle score", pct(r.car_probability)],

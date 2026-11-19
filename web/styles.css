@@ -277,6 +277,20 @@ p { margin: 0; }
 .fact { border: 1px solid var(--line-2); border-radius: 10px; padding: 10px 12px; background: var(--ink); }
 .fact span { display: block; font: 500 10.5px var(--mono); letter-spacing: 0.12em; color: var(--fg-3); text-transform: uppercase; }
 .fact b { font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+.worldref { margin: 0; display: grid; grid-template-columns: 160px 1fr; gap: 14px; align-items: center;
+  border: 1px solid rgba(56, 232, 255, 0.35); border-radius: 12px; padding: 10px; background: linear-gradient(120deg, rgba(56, 232, 255, 0.08), var(--ink) 60%); }
+.worldref__img { display: block; border-radius: 8px; overflow: hidden; aspect-ratio: 3 / 2; background: var(--panel-solid); }
+.worldref__img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s var(--ease); }
+.worldref__img:hover img { transform: scale(1.06); }
+.worldref figcaption { display: grid; gap: 4px; min-width: 0; }
+.worldref figcaption .strip__title { color: var(--cyan); margin: 0; }
+.worldref b { font-size: 15px; overflow-wrap: anywhere; }
+.worldref__meta { font-size: 11.5px; color: var(--fg-2); letter-spacing: 0.04em; }
+.worldref small { font-size: 11.5px; color: var(--fg-3); overflow-wrap: anywhere; }
+.worldref small a { color: var(--fg-2); }
+.worldref[hidden], .worldref__img[hidden] { display: none; }
+.worldref.is-zeroshot { grid-template-columns: 1fr; }
+@media (max-width: 520px) { .worldref { grid-template-columns: 1fr; } }
 .top5 ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: c; }
 .top5 li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: center; counter-increment: c; }
 .top5 li::before { content: "0" counter(c); font: 500 11px var(--mono); color: var(--fg-3); }

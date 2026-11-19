@@ -68,6 +68,8 @@ def _pred(r: dict) -> dict:
     out["closest_trained_class"] = r.get("closest_trained_class")
     out["outside_mass"] = r.get("outside_mass")
     out["possibly_outside"] = bool(r.get("possibly_outside", False))
+    w = r.get("world")                       # world-car layer answer (extra layer, outside the 196 classes)
+    out["world"] = None if w is None else {k: (float(v) if isinstance(v, (np.floating, float)) else v) for k, v in w.items()}
     return out
 
 
@@ -161,6 +163,8 @@ def health():
 
 app.mount("/examples", StaticFiles(directory=C.PROJECT_ROOT / "examples"), name="examples")
 app.mount("/docs-assets", StaticFiles(directory=C.PROJECT_ROOT / "docs"), name="docs")
+if (WEB / "world_refs").exists():          # reference photos of the world-car layer (Wikimedia Commons, credited)
+    app.mount("/world_refs", StaticFiles(directory=WEB / "world_refs"), name="world_refs")
 app.mount("/static", StaticFiles(directory=WEB), name="static")
 
 

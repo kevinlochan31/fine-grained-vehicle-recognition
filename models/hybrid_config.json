@@ -16,5 +16,8 @@
  "open_require_disagreement": false,
  "unknown_make_weight": 0.5,
  "open_name_conf": 0.8,
- "unknown_make_conf": 0.4
+ "unknown_make_conf": 0.4,
+ "world_route_conf": 0.95,
+ "world_name_conf": 0.95,
+ "world_zs_conf": 0.5
 }

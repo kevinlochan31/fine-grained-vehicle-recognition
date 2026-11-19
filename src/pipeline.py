@@ -78,6 +78,13 @@ class VehicleRecognizer:
             self.vision = CarVision(device=device)
             # classifier make index -> CLIP catalogue make index (catalogue makes are a superset)
             self._mk_map = np.array([self.vision.makes.index(m) for m in self.makes])
+        # World-car layer (extra, never touches the 196-class models): names cars outside the training set.
+        self.world = None
+        from .worldcars import GALLERY
+        import os
+        if use_clip and GALLERY.exists() and os.environ.get("CVH_WORLD", "1") != "0":
+            from .worldcars import WorldCars
+            self.world = WorldCars(device=device)
         self.clip_ft = None
         from .clip_classifier import WEIGHTS
         if use_clip and WEIGHTS.exists():
@@ -239,15 +246,29 @@ class VehicleRecognizer:
                  or (cfg.get("open_require_disagreement", False) and ctx.get("members_agree")))  # both nets agree
         pred["outside_mass"] = zs["outside_mass"]
         pred["open_set_top5"] = [{"label": l, "p": p, "in_training_set": s} for l, p, s in zs["name_top5"]]
-        if known and pred["status"] != "low-confidence":
+        # World-car layer: a reference-photo probe over ~170 modern models + the 196 trained classes.
+        wm = None
+        if self.world is not None and "feature" in zs:
+            if "world" not in ctx:
+                f = zs["feature"] if self.world.model is None else self.world.embed(
+                    ctx["rgb"], crop if ctx.get("det", {}).get("source", "").startswith("yolo") else None)
+                ctx["world"] = self.world.match(f)
+            wm = ctx["world"]
+        world_ok = wm is not None and wm["top_is_world"]
+        # Override "this is a trained class" only on very strong reference-photo evidence (budget: <=0.1% of
+        # Stanford val cars), e.g. a 2019 Camry that the classifier calls "Toyota Camry Sedan 2012".
+        world_route = world_ok and wm["p"] >= cfg.get("world_route_conf", 1.01)
+        if known and not world_route and pred["status"] != "low-confidence":
             return pred
+        pred["closest_trained_class"] = pred["label"]
+        if world_ok and wm["p"] >= cfg.get("world_name_conf", 1.01):
+            return self._world_answer(pred, wm)
         V = self.vision
         p_make_cls = np.zeros(len(V.makes)); p_make_cls[self._mk_map] = self._group(probs, self.make_idx, len(self.makes))
         make, make_p, named, within = decide_unfamiliar(
             V.makes, p_make_cls, V.entries, V.entry_make, zs["name_probs"],
             cfg.get("unknown_make_weight", 0.5), cfg.get("open_name_conf", 0.3))
         closest = pred["label"]
-        pred["closest_trained_class"] = closest
         if known:
             # Probably a trained class but the classifier is too unsure for any level of its hierarchy:
             # do not present its top class as the answer; it stays visible in the top-5 list.
@@ -266,6 +287,15 @@ class VehicleRecognizer:
                         confidence=float(zs["name_probs"][named]),
                         display=f"{e['label']} (not in the 196 training classes)",
                         top5=[(l, p) for l, p, _ in zs["name_top5"]])
+        elif (wm is not None and wm["zs_p"] >= cfg.get("world_zs_conf", 1.01)
+              and make_p >= cfg.get("unknown_make_conf", 0.5) and _mk(wm["zs_make"]) == _mk(make)):
+            # zero-shot over the ~2,000-model world catalogue, make-consistent: model named, generation not
+            pred.update(status="world", label=f"{wm['zs_make']} {wm['zs_model']}", make=wm["zs_make"],
+                        model=wm["zs_model"], year="generation not determined", confidence=wm["zs_p"],
+                        display=f"{wm['zs_make']} {wm['zs_model']} · generation not determined · zero-shot (no reference photo)",
+                        world=dict(make=wm["zs_make"], model=wm["zs_model"], gen=None, years="", y0=None,
+                                   source="zero-shot catalogue", p=wm["zs_p"], ref=None),
+                        top5=[(l, p) for l, p, _ in zs["name_top5"]])
         elif make_p >= cfg.get("unknown_make_conf", 0.5):
             pred.update(status="unknown-model", label=f"{make} (unknown model)", make=make,
                         model="Model not recognised", year="unknown", confidence=make_p,
@@ -277,12 +307,30 @@ class VehicleRecognizer:
                         top5=[(l, p) for l, p, _ in zs["name_top5"]])
         return pred
 
+    def _world_answer(self, pred, wm):
+        from .worldcars import describe_world
+        c, r = wm["cls"], wm["ref"]
+        label = describe_world(c)
+        pred.update(status="world", label=label, make=c["make"], model=c["model"], year=c.get("years") or "unknown",
+                    confidence=wm["p"], in_training_set=False,
+                    display=f"{label} · matched from reference photos",
+                    world=dict(make=c["make"], model=c["model"], gen=c.get("gen"), years=c.get("years"), y0=c.get("y0"),
+                               source="reference photos", p=wm["p"], ref_similarity=wm["ref_sim"],
+                               ref=dict(image=r["image"], author=r["author"], license=r["license"],
+                                        license_url=r["license_url"], source=r["source"], title=r["title"])))
+        return pred
+
+
+def _mk(m: str) -> str:
+    from .worldcars import make_key
+    return make_key(m)
+
 
 def draw_result(res: dict) -> np.ndarray:
     img = res["image"].copy()
     x1, y1, x2, y2 = res["box"]
     colour = {"confident": (40, 200, 70), "year-uncertain": (240, 180, 0),
-              "model-uncertain": (255, 120, 0)}.get(res["status"], (230, 40, 40))
+              "model-uncertain": (255, 120, 0), "world": (150, 210, 40)}.get(res["status"], (230, 40, 40))
     th = max(2, int(min(img.shape[:2]) / 200))
     cv2.rectangle(img, (x1, y1), (x2, y2), colour, th)
     text = f"{res['display']}  {res['confidence'] * 100:.1f}%"

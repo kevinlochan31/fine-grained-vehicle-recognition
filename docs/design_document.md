@@ -68,6 +68,7 @@ The diagram is generated from `docs/make_architecture.py`. Each box maps to code
 | Classical features + PCA + logistic regression | `src/classical.py::extract_features`, `scripts/train_classical.py` |
 | Calibrated ensemble, late fusion, hierarchical low-confidence handling | `src/pipeline.py::VehicleRecognizer.run / describe` |
 | Open-set check and open-vocabulary naming (954-model catalogue) | `src/pipeline.py::_open_set`, `data_meta/car_catalogue.json` |
+| World-car layer (extra; 4,689-entry catalogue, SigLIP reference-photo probe) | `src/worldcars.py`, `src/pipeline.py::_world_answer`, `data_meta/world_catalogue.json`, `models/world_gallery.npz` |
 | Web UI / API | `web/`, `app.py` |
 
 ## 4. Classical computer vision components
@@ -273,6 +274,65 @@ hybrid top-1 is 95.45%.
 - *Errors.* Of 330 hybrid errors, 11.8% are the right make+model with the wrong year, 66.4% the right make
   with the wrong model (TTS Coupe vs TT Hatchback, S5 vs A5, Express Van vs Express Cargo Van) and 21.8% a
   different make (mostly badge-engineered twins).
+
+## 8a. World car recognition (extra layer)
+
+**Why.** Stanford Cars stops at 2012 and contains almost no Indian-market cars, so a 2024 Maruti Suzuki
+Swift could at best get "Suzuki, model not recognised". The brief requires the reported metrics to come
+from models trained only on Stanford Cars. So world-car recognition is a separate, clearly labelled layer on
+the open-set path. It does not retrain, replace or re-weight the 196-class models, and it does not change
+the open-set routing rule or its thresholds.
+
+**Components.**
+1. *Catalogue* (`data_meta/world_catalogue.json`, `scripts/build_world_catalogue.py`): 4,689 make / model /
+   generation entries with year ranges (3,668 models, 215 makes, up to 2026), a superset of the
+   954-entry routing catalogue. That one is kept unchanged, because the routing thresholds were tuned on it.
+2. *Reference photos* (`scripts/fetch_world_photos.py`, `scripts/build_world_gallery.py`): Wikimedia Commons
+   categories of each generation (chosen by dating the photos in each sub-category). 2,389 photos of 193
+   models were downloaded. A quality filter (YOLO box ≥ 15% of the frame, CLIP gate ≥ 0.9, zero-shot
+   "exterior" check) and near-duplicate removal left 175 models. Each model is split into ≤ 5 reference and
+   ≤ 3 test photos, by photographer for 98.3% of models: 841 reference, 512 test. Licence, author and
+   source of every shipped thumbnail are in `data_meta/world_refs.csv` and `docs/world_photo_credits.md`.
+3. *Matcher* (`src/worldcars.py`): a linear probe on L2-normalised embeddings (mean of frame and YOLO crop)
+   over 175 world classes **plus the 196 Stanford classes** (Stanford train split), so a newer generation
+   of a trained family can be told apart from the trained one. Probabilities are temperature-scaled
+   (T = 0.21) on reference-photo cross-validation + Stanford val.
+4. *Decision* (`pipeline._open_set`): (a) if the probe's best class is a world model with p ≥
+   `world_route_conf` = 0.95, the classifier's "known class" verdict is overridden. The threshold is set so
+   0 of 788 Stanford val cars get a world answer. (b) On the open-set path, p ≥ `world_name_conf` = 0.95
+   names make → model → generation ("… · matched from reference photos", with the closest reference photo).
+   Otherwise the existing rule applies, with one addition: a make-consistent zero-shot name from the world
+   catalogue at p ≥ `world_zs_conf` = 0.5, shown without a generation. The thresholds were tuned on
+   reference cross-validation and leave-models-out negatives (+1 right generation, −1 wrong model), never
+   on the test photos.
+
+**Backbone choice.** Same probe, same 512 held-out photos (forced choice):
+
+| Backbone | Make | Model | Generation | GPU fp16 / CPU 2 threads (image tower) |
+|---|---|---|---|---|
+| CLIP ViT-B/16 laion2b (the gate's model) | 77.5% | 70.3% | 68.9% | 3.9 / 165 ms |
+| CLIP ViT-L/14 laion2b | 87.1% | 79.9% | 77.9% | 9.1 / 756 ms |
+| **SigLIP ViT-B/16 webli (adopted)** | **93.0%** | **85.4%** | **84.6%** | 4.0 / 172 ms |
+
+For SigLIP, the probe beat 1-NN (80.3% generation), class prototypes (83.0%) and text-only zero-shot
+(82.4% make, 36.3% model). SigLIP is used only by the world layer. The vehicle gate and the routing keep
+the tuned CLIP ViT-B/16, so they did not need re-tuning: gate acceptance on Stanford test is still 99.89%,
+and non-car probes are still rejected.
+
+**End to end (full app pipeline, 512 held-out photos).** Right make + model + generation 53.5%, right
+model 9.6%, right make only 8.6%, "unknown car" 21.7%, **wrong 6.6%**. Without the layer: right model
+20.9%, make only 24.2%, unknown 40.0%, **wrong 14.8%**. When a generation is named it is right 96.9% of
+the time.
+
+**Stanford safety.** Hybrid 95.90% / 99.75% top-1 / top-5 (unchanged models, recomputed). Known-car
+re-routing on test is 0.796% before and after (+0.0%). On 500 random Stanford test images run end to end,
+0.2% of displayed answers changed and confident-correct stayed at 93.4%.
+
+**Limits.** Only 175 models have reference photos. The remaining catalogue models are named zero-shot at
+best, without a generation. Facelifts within a generation are not separated. Some old Indian cars
+(Maruti 800, Omni, Zen) are still confused, partly because the classifier is confidently wrong on them
+(e.g. "Volkswagen Golf Hatchback 1991") and the world probe is not confident enough to override it.
+Commons photos are skewed toward clean daytime shots, so street photos at night will score lower.
 
 ## 9. Failure-case analysis
 

@@ -1,0 +1,426 @@
+{
+ "comparison": {
+  "n_models": 175,
+  "n_ref": 841,
+  "n_test": 512,
+  "author_disjoint_models": 0.9828571428571429,
+  "backbones": {
+   "b16": {
+    "frame+crop": {
+     "zero_shot_models": {
+      "make": 0.66796875,
+      "model": 0.29296875,
+      "generation": 0.0,
+      "n": 512
+     },
+     "zero_shot_generations": {
+      "make": 0.62890625,
+      "model": 0.294921875,
+      "generation": 0.220703125,
+      "n": 512
+     },
+     "nn1_refs": {
+      "make": 0.734375,
+      "model": 0.6328125,
+      "generation": 0.625,
+      "n": 512
+     },
+     "prototypes": {
+      "make": 0.759765625,
+      "model": 0.685546875,
+      "generation": 0.669921875,
+      "n": 512
+     },
+     "probe_world": {
+      "make": 0.798828125,
+      "model": 0.724609375,
+      "generation": 0.708984375,
+      "n": 512
+     },
+     "probe_world+stanford": {
+      "make": 0.775390625,
+      "model": 0.703125,
+      "generation": 0.689453125,
+      "n": 512,
+      "stanford_val_top1": 0.9175126903553299,
+      "stanford_val_world_answer@0.0": 0.0012690355329949238,
+      "stanford_val_world_answer@0.5": 0.0,
+      "stanford_val_world_answer@0.8": 0.0
+     }
+    },
+    "crop": {
+     "zero_shot_models": {
+      "make": 0.630859375,
+      "model": 0.271484375,
+      "generation": 0.0,
+      "n": 512
+     },
+     "zero_shot_generations": {
+      "make": 0.591796875,
+      "model": 0.287109375,
+      "generation": 0.2109375,
+      "n": 512
+     },
+     "nn1_refs": {
+      "make": 0.689453125,
+      "model": 0.587890625,
+      "generation": 0.58203125,
+      "n": 512
+     },
+     "prototypes": {
+      "make": 0.728515625,
+      "model": 0.638671875,
+      "generation": 0.623046875,
+      "n": 512
+     },
+     "probe_world": {
+      "make": 0.763671875,
+      "model": 0.685546875,
+      "generation": 0.671875,
+      "n": 512
+     },
+     "probe_world+stanford": {
+      "make": 0.75,
+      "model": 0.6640625,
+      "generation": 0.650390625,
+      "n": 512,
+      "stanford_val_top1": 0.8604060913705583,
+      "stanford_val_world_answer@0.0": 0.0012690355329949238,
+      "stanford_val_world_answer@0.5": 0.0,
+      "stanford_val_world_answer@0.8": 0.0
+     }
+    },
+    "latency": {
+     "cpu_ms_2threads": 167.3,
+     "gpu_fp16_ms": 4.29,
+     "image_tower_params_m": 86.2,
+     "input": 224
+    }
+   },
+   "l14": {
+    "frame+crop": {
+     "zero_shot_models": {
+      "make": 0.771484375,
+      "model": 0.32421875,
+      "generation": 0.0,
+      "n": 512
+     },
+     "zero_shot_generations": {
+      "make": 0.755859375,
+      "model": 0.3671875,
+      "generation": 0.3046875,
+      "n": 512
+     },
+     "nn1_refs": {
+      "make": 0.833984375,
+      "model": 0.75390625,
+      "generation": 0.744140625,
+      "n": 512
+     },
+     "prototypes": {
+      "make": 0.861328125,
+      "model": 0.791015625,
+      "generation": 0.78125,
+      "n": 512
+     },
+     "probe_world": {
+      "make": 0.875,
+      "model": 0.8046875,
+      "generation": 0.791015625,
+      "n": 512
+     },
+     "probe_world+stanford": {
+      "make": 0.87109375,
+      "model": 0.798828125,
+      "generation": 0.779296875,
+      "n": 512,
+      "stanford_val_top1": 0.9606598984771574,
+      "stanford_val_world_answer@0.0": 0.0,
+      "stanford_val_world_answer@0.5": 0.0,
+      "stanford_val_world_answer@0.8": 0.0
+     }
+    },
+    "crop": {
+     "zero_shot_models": {
+      "make": 0.740234375,
+      "model": 0.302734375,
+      "generation": 0.0,
+      "n": 512
+     },
+     "zero_shot_generations": {
+      "make": 0.71875,
+      "model": 0.33984375,
+      "generation": 0.2890625,
+      "n": 512
+     },
+     "nn1_refs": {
+      "make": 0.822265625,
+      "model": 0.74609375,
+      "generation": 0.736328125,
+      "n": 512
+     },
+     "prototypes": {
+      "make": 0.8515625,
+      "model": 0.775390625,
+      "generation": 0.763671875,
+      "n": 512
+     },
+     "probe_world": {
+      "make": 0.859375,
+      "model": 0.79296875,
+      "generation": 0.783203125,
+      "n": 512
+     },
+     "probe_world+stanford": {
+      "make": 0.84765625,
+      "model": 0.7734375,
+      "generation": 0.755859375,
+      "n": 512,
+      "stanford_val_top1": 0.9289340101522843,
+      "stanford_val_world_answer@0.0": 0.0,
+      "stanford_val_world_answer@0.5": 0.0,
+      "stanford_val_world_answer@0.8": 0.0
+     }
+    },
+    "latency": {
+     "cpu_ms_2threads": 744.4,
+     "gpu_fp16_ms": 9.04,
+     "image_tower_params_m": 304.0,
+     "input": 224
+    }
+   },
+   "siglip": {
+    "frame+crop": {
+     "zero_shot_models": {
+      "make": 0.82421875,
+      "model": 0.36328125,
+      "generation": 0.0,
+      "n": 512
+     },
+     "zero_shot_generations": {
+      "make": 0.810546875,
+      "model": 0.390625,
+      "generation": 0.3203125,
+      "n": 512
+     },
+     "nn1_refs": {
+      "make": 0.90625,
+      "model": 0.810546875,
+      "generation": 0.802734375,
+      "n": 512
+     },
+     "prototypes": {
+      "make": 0.916015625,
+      "model": 0.837890625,
+      "generation": 0.830078125,
+      "n": 512
+     },
+     "probe_world": {
+      "make": 0.931640625,
+      "model": 0.865234375,
+      "generation": 0.859375,
+      "n": 512
+     },
+     "probe_world+stanford": {
+      "make": 0.9296875,
+      "model": 0.853515625,
+      "generation": 0.845703125,
+      "n": 512,
+      "stanford_val_top1": 0.9619289340101523,
+      "stanford_val_world_answer@0.0": 0.0,
+      "stanford_val_world_answer@0.5": 0.0,
+      "stanford_val_world_answer@0.8": 0.0
+     }
+    },
+    "crop": {
+     "zero_shot_models": {
+      "make": 0.826171875,
+      "model": 0.380859375,
+      "generation": 0.0,
+      "n": 512
+     },
+     "zero_shot_generations": {
+      "make": 0.814453125,
+      "model": 0.40234375,
+      "generation": 0.33203125,
+      "n": 512
+     },
+     "nn1_refs": {
+      "make": 0.900390625,
+      "model": 0.80859375,
+      "generation": 0.798828125,
+      "n": 512
+     },
+     "prototypes": {
+      "make": 0.91015625,
+      "model": 0.830078125,
+      "generation": 0.822265625,
+      "n": 512
+     },
+     "probe_world": {
+      "make": 0.93359375,
+      "model": 0.861328125,
+      "generation": 0.853515625,
+      "n": 512
+     },
+     "probe_world+stanford": {
+      "make": 0.921875,
+      "model": 0.849609375,
+      "generation": 0.841796875,
+      "n": 512,
+      "stanford_val_top1": 0.9606598984771574,
+      "stanford_val_world_answer@0.0": 0.0,
+      "stanford_val_world_answer@0.5": 0.0,
+      "stanford_val_world_answer@0.8": 0.0
+     }
+    },
+    "latency": {
+     "cpu_ms_2threads": 172.3,
+     "gpu_fp16_ms": 4.0,
+     "image_tower_params_m": 92.9,
+     "input": 224
+    }
+   }
+  }
+ },
+ "live": {
+  "backbone": "ViT-B-16-SigLIP webli",
+  "method": "linear probe over world reference photos + Stanford train (196 classes)",
+  "n_models": 175,
+  "n_ref": 841,
+  "n_test": 512,
+  "thresholds": {
+   "world_route_conf": 0.95,
+   "world_name_conf": 0.95,
+   "world_zs_conf": 0.5
+  },
+  "tuning": {
+   "temperature": 0.2059151134625025,
+   "name_conf_grid": {
+    "0.2": -0.051724137931034475,
+    "0.25": -0.03864447086801426,
+    "0.3": -0.02378121284185497,
+    "0.35": -0.0011890606420927319,
+    "0.4": 0.029131985731272292,
+    "0.45": 0.05885850178359098,
+    "0.5": 0.08799048751486327,
+    "0.55": 0.11414982164090365,
+    "0.6": 0.14447086801426873,
+    "0.65": 0.17122473246135553,
+    "0.7": 0.2033293697978597,
+    "0.75": 0.2247324613555291,
+    "0.8": 0.24435196195005943,
+    "0.85": 0.2574316290130797,
+    "0.9": 0.2639714625445898,
+    "0.95": 0.26516052318668254
+   },
+   "route_conf_stanford_val_world_rate": {
+    "0.3": 0.0,
+    "0.32": 0.0,
+    "0.34": 0.0,
+    "0.36": 0.0,
+    "0.38": 0.0,
+    "0.4": 0.0,
+    "0.42": 0.0,
+    "0.44": 0.0,
+    "0.46": 0.0,
+    "0.48": 0.0,
+    "0.5": 0.0,
+    "0.52": 0.0,
+    "0.54": 0.0,
+    "0.56": 0.0,
+    "0.58": 0.0,
+    "0.6": 0.0,
+    "0.62": 0.0,
+    "0.64": 0.0,
+    "0.66": 0.0,
+    "0.68": 0.0,
+    "0.7": 0.0,
+    "0.72": 0.0,
+    "0.74": 0.0,
+    "0.76": 0.0,
+    "0.78": 0.0,
+    "0.8": 0.0,
+    "0.82": 0.0,
+    "0.84": 0.0,
+    "0.86": 0.0,
+    "0.88": 0.0,
+    "0.9": 0.0,
+    "0.92": 0.0,
+    "0.94": 0.0,
+    "0.96": 0.0,
+    "0.98": 0.0
+   },
+   "zs_conf_grid": {
+    "0.1": -0.1272294887039239,
+    "0.15": -0.06777645659928656,
+    "0.2": -0.026159334126040427,
+    "0.25": 0.009512485136741973,
+    "0.3": 0.04399524375743163,
+    "0.35": 0.06896551724137931,
+    "0.4": 0.07847800237812129,
+    "0.45": 0.08680142687277051,
+    "0.5": 0.09155766944114149,
+    "0.55": 0.08442330558858502,
+    "0.6": 0.07372175980975029,
+    "0.65": 0.07015457788347206,
+    "0.7": 0.057074910820451845,
+    "0.75": 0.04875148632580262,
+    "0.8": 0.0356718192627824,
+    "0.85": 0.030915576694411414,
+    "0.9": 0.0178359096313912,
+    "0.95": 0.0
+   },
+   "cv_positives": 841,
+   "leave_models_out_negatives": 841
+  },
+  "test_forced_choice": {
+   "make": 0.9296875,
+   "model": 0.853515625,
+   "generation": 0.845703125,
+   "n": 512
+  },
+  "test_named_at_threshold": {
+   "coverage": 0.5703125,
+   "precision_generation": 0.9691780821917808,
+   "precision_model": 0.9726027397260274,
+   "precision_make": 0.9897260273972602
+  },
+  "test_zero_shot_only": {
+   "make": 0.82421875,
+   "model": 0.36328125,
+   "generation": 0.0,
+   "n": 512
+  },
+  "stanford_test": {
+   "n": 8041,
+   "top1_before_routing": 0.9589603283173734,
+   "known_rerouted_before": 0.007959209053600298,
+   "known_rerouted_after": 0.007959209053600298,
+   "extra_rerouted_by_world_layer": 0.0,
+   "extra_rerouted_that_were_correct": 0.0,
+   "probe_top1_on_stanford_test": 0.946026613605273
+  }
+ },
+ "e2e_world_test": {
+  "n": 512,
+  "correct_generation": 0.53515625,
+  "correct_model": 0.095703125,
+  "correct_make_only": 0.0859375,
+  "unknown": 0.216796875,
+  "wrong": 0.06640625,
+  "no_car": 0.0
+ },
+ "e2e_world_test_without_world_layer": {
+  "correct_model_or_better": 0.208984375,
+  "correct_make_only": 0.2421875,
+  "unknown_or_no_car": 0.400390625,
+  "wrong": 0.1484375
+ },
+ "e2e_stanford_test_sample": {
+  "n": 500,
+  "answers_changed": 0.002,
+  "confident_and_correct_without_world": 0.934,
+  "confident_and_correct_with_world": 0.934
+ }
+}

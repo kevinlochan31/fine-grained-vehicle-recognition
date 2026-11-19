@@ -26,6 +26,8 @@ image = (
     .env({"HF_HOME": "/root/.hf", "YOLO_CONFIG_DIR": "/tmp/Ultralytics", "MPLCONFIGDIR": "/tmp/mpl",
           "CVH_WORK_DIR": "/tmp/cvh", "OMP_NUM_THREADS": "2"})
     .run_commands("python -c \"import open_clip; open_clip.create_model_and_transforms('ViT-B-16', pretrained='laion2b_s34b_b88k')\"")
+    # world-car layer backbone (SigLIP ViT-B/16, image tower only at run time)
+    .run_commands("python -c \"import open_clip; open_clip.create_model_and_transforms('ViT-B-16-SigLIP', pretrained='webli')\"")
     .add_local_dir(".", remote_path="/app", ignore=IGNORE)
 )
 
