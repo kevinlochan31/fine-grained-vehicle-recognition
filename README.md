@@ -67,9 +67,11 @@ sits on the open-set path. It never changes the 196-class models, their outputs 
   (3,668 models, 215 makes) up to 2026**. It covers India (Maruti Suzuki, Tata, Mahindra, Hyundai, Kia,
   Honda, Toyota, MG, Skoda, Renault, VW, Nissan, Citroen, Force, Hindustan…), Japan, Korea, Europe, the US
   and China (BYD, Geely, NIO, XPeng, Li Auto, Zeekr…). Built by `scripts/build_world_catalogue.py`.
-- **Reference photos:** 2,389 freely licensed Wikimedia Commons photos of 193 modern models were
-  downloaded (`scripts/fetch_world_photos.py`). Interiors, badges, scale models etc. were filtered out,
-  leaving **175 models: 841 reference photos and 512 held-out test photos**. The split is by
+- **Reference photos:** 3,813 freely licensed Wikimedia Commons photos of 193 modern models were
+  downloaded (`scripts/fetch_world_photos.py`; up to 40 per model for models that had few). Interiors,
+  badges, scale models etc. were filtered out, leaving **175 models: 2,103 reference photos (median 10 per
+  model) and 512 held-out test photos**. The test set is frozen (`test_frozen.csv`), so adding photos never
+  changes it. The split is by
   photographer for 98.3% of models, so a test photo is never a re-shot of a reference car.
 - **Matching:** a linear probe on SigLIP ViT-B/16 embeddings (frame + YOLO crop), trained on the reference
   photos **plus the 196 Stanford classes** (train split). That way it can tell a 2017 Camry from the 2012
@@ -79,7 +81,8 @@ sits on the open-set path. It never changes the 196-class models, their outputs 
 - **Website:** e.g. "Maruti Suzuki Swift · 4th gen (2024–present) · matched from reference photos", with
   the closest reference photo and its author / licence / source ([credits](docs/world_photo_credits.md)).
 
-**Held-out accuracy (512 test photos, 175 models, never seen while building or tuning):**
+**Held-out accuracy (512 test photos, 175 models, never seen while building or tuning).** Backbone comparison
+(done with the first 841 reference photos):
 
 | Zero-shot backbone (world layer) | Make | Model | Generation | Image tower, GPU / CPU (2 threads) |
 |---|---|---|---|---|
@@ -88,27 +91,28 @@ sits on the open-set path. It never changes the 196-class models, their outputs 
 | **SigLIP ViT-B/16 (webli), adopted** | **93.0%** | **85.4%** | **84.6%** | 4.0 ms / 172 ms |
 | SigLIP, text only, no reference photos | 82.4% | 36.3% | n/a | |
 
-(Probe over 175 world models + 196 Stanford classes, forced choice, frame + crop input.)
+(Probe over 175 world models + 196 Stanford classes, forced choice, frame + crop input.) With all 2,103
+reference photos, SigLIP reaches **94.1% make / 88.5% model / 88.1% generation**.
 
 **Full app pipeline on the same 512 photos (what the user sees):**
 
 | Outcome | Before (no world layer) | With world layer |
 |---|---|---|
-| Right make + model + generation | n/a | **53.5%** |
-| Right model (generation not given or wrong) | 20.9% (any) | 9.6% |
-| Right make only ("model not recognised" + closest models) | 24.2% | 18.0% |
-| "Unknown car" (no claim) | 40.0% | 12.9% |
-| **Wrong** | 14.8% | **6.1%** |
+| Right make + model + generation | n/a | **60.9%** |
+| Right model (generation not given or wrong) | 20.9% (any) | 7.6% |
+| Right make only ("model not recognised" + closest models) | 24.2% | 13.7% |
+| "Unknown car" (no claim) | 40.0% | 12.7% |
+| **Wrong** | 14.8% | **5.1%** |
 
-Indian-market cars (212 photos): right generation 42.5%, right model 15.1%, make only 21.2%, unknown 13.2%,
-wrong 8.0%. Rest of the world (300): 61.3% / 5.7% / 15.7% / 12.7% / 4.7%.
+Indian-market cars (212 photos): right generation 46.7%, right model 13.7%, make only 21.2%, unknown 11.8%,
+wrong 6.6%. Rest of the world (300): 71.0% / 3.3% / 8.3% / 13.3% / 4.0%.
 
-If the layer is not sure of the model but is ≥ 90% sure of the make (summed over that make's models), it
+If the layer is not sure of the model but is ≥ 95% sure of the make (summed over that make's models), it
 answers e.g. "Maruti Suzuki, model not recognised · closest: Grand Vitara, Fronx, Brezza". That threshold
-gives 96% make precision on reference-photo cross-validation. A model-level tier ("generation not certain")
+is the lowest giving ≥ 95% make precision on reference-photo cross-validation. A model-level tier ("generation not certain")
 never reached 95% precision in tuning, so it stays effectively off (threshold 0.99).
 
-When the layer names a generation it is right **96.9%** of the time (model 97.3%, make 99.0%).
+When the layer names a generation it is right **98.2%** of the time (make 98.8%); it does so for 63.7% of photos.
 
 **Stanford Cars safety checks:** hybrid still **95.90% top-1 / 99.75% top-5** on the 8,041 test images
 (the models are untouched). Known cars wrongly re-routed to the open-set path stay at **0.796%**: the world

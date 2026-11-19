@@ -3,7 +3,7 @@
 select : YOLO11s finds the car (box conf >= 0.5, box >= 15% of the frame), the CLIP gate says "car"
          (p >= 0.9) and a zero-shot exterior check rejects interiors, engine bays, badges, wheels, scale
          models and drawings. Near-duplicates (cosine >= 0.95 within a model) are dropped.
-         Per model the photos are split into a reference set (<= 5) and a held-out test set (<= 3).
+         Per model the photos are split into a reference set (<= 20) and a held-out test set (<= 3).
          The split is by photographer where possible (test authors never appear in the reference set),
          so the test measures recognition of a different car/photo session, not a re-shot of the same car.
 embed  : for each backbone (live CLIP ViT-B/16 + the candidates ViT-L/14 and SigLIP ViT-B/16) embed the
@@ -28,6 +28,11 @@ from src import config as C
 from src.data import cache_path, crop_image, read_rgb
 
 W = C.WORK_DIR / "world_cars"
+MAX_REF = 20          # reference photos per model (all usable photos that are not in the test set)
+# Frozen held-out test set: once written, later re-selections (e.g. after downloading more photos) keep exactly
+# these test photos, so accuracy before/after stays comparable.
+_FZ = W / "test_frozen.csv"
+FROZEN = set(pd.read_csv(_FZ).file) if _FZ.exists() else set()
 BACKBONES = {"b16": ("ViT-B-16", "laion2b_s34b_b88k"), "l14": ("ViT-L-14", "laion2b_s32b_b82k"),
              "siglip": ("ViT-B-16-SigLIP", "webli")}
 EXT = ["a photo of a car's exterior.", "a photo of a whole car taken from outside.", "a photo of a car on the road."]
@@ -77,7 +82,28 @@ def select():
             if all(float(emb[fl] @ emb[k]) < 0.95 for k in kept):
                 kept.append(fl)
         g = g[g.file.isin(kept)]
-        if len(g) < 4:
+        frozen = [f for f in g.file if f in FROZEN]
+        if frozen:
+            # frozen test set (test_frozen.csv): keep exactly the earlier test photos; every other usable photo by
+            # a photographer who is not in the test set becomes a reference (up to MAX_REF)
+            t_auth = set(g[g.file.isin(frozen)].author)
+            # never let a reference be a near-copy of a test photo (cosine >= 0.95)
+            clean = g[[all(float(emb[f] @ emb[t]) < 0.95 for t in frozen) or f in frozen for f in g.file]]
+            rest = [L for a, L in clean[~clean.file.isin(frozen) & ~clean.author.isin(t_auth)].groupby("author").file.apply(list).items()]
+            disjoint = bool(rest)
+            if not rest:                                       # single photographer: any non-test photo
+                rest = [list(clean[~clean.file.isin(frozen)].file)]
+            ref = []
+            while len(ref) < MAX_REF and any(rest):
+                for L in rest:
+                    if L and len(ref) < MAX_REF:
+                        ref.append(L.pop(0))
+            for fl in ref:
+                split[fl] = ("ref", disjoint)
+            for fl in frozen:
+                split[fl] = ("test", disjoint)
+            continue
+        if FROZEN or len(g) < 4:
             continue
         authors = list(g.groupby("author").file.apply(list).items())
         rng.shuffle(authors)
@@ -88,14 +114,14 @@ def select():
         while len(test) < n_test and ai < len(authors) - 1:    # keep at least one author for the references
             test += authors[ai][1][: n_test - len(test)]; ai += 1
         rest = [a[1] for a in authors[ai:]]
-        while len(ref) < 5 and any(rest):                      # round-robin over the remaining authors
+        while len(ref) < MAX_REF and any(rest):                      # round-robin over the remaining authors
             for L in rest:
-                if L and len(ref) < 5:
+                if L and len(ref) < MAX_REF:
                     ref.append(L.pop(0))
         if len(test) < n_test or len(ref) < 2:                 # one photographer only: split by photo
             disjoint = False
             allf = list(g.file); rng.shuffle(allf)
-            test, ref = allf[:n_test], allf[n_test:n_test + 5]
+            test, ref = allf[:n_test], allf[n_test:n_test + MAX_REF]
         for fl in ref:
             split[fl] = ("ref", disjoint)
         for fl in test:

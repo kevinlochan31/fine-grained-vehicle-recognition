@@ -277,7 +277,7 @@ def build(name="b16"):
     pos_l, pos_t, neg_l, neg_t = [], [], [], []
     rank = df[ref].groupby("cls").cumcount().values
     for f in range(5):
-        tr = rank != f
+        tr = rank % 5 != f
         Wt, b = train(Xr_all[tr], yr[tr])
         pos_l.append(Xr_all[~tr] @ Wt.T + b); pos_t += list(yr[~tr])
     rng = np.random.default_rng(0)
