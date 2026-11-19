@@ -69,6 +69,8 @@ def _pred(r: dict) -> dict:
     out["outside_mass"] = r.get("outside_mass")
     out["possibly_outside"] = bool(r.get("possibly_outside", False))
     w = r.get("world")                       # world-car layer answer (extra layer, outside the 196 classes)
+    wk = r.get("world_make")
+    out["world_make"] = None if wk is None else dict(make=wk["make"], p=float(wk["p"]), candidates=list(wk["candidates"]))
     out["world"] = None if w is None else {k: (float(v) if isinstance(v, (np.floating, float)) else v) for k, v in w.items()}
     return out
 

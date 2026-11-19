@@ -569,6 +569,8 @@
         : `Not one of the 196 Stanford training classes. The world-car layer named the model zero-shot from its ~2,000-model catalogue (${pct(r.confidence)} sure); with no reference photo it does not claim a generation.`)
       : open
       ? `Not one of the 196 training classes, so it was named open-vocabulary by CLIP from ~950 catalogued models. Closest trained class: ${r.closest_trained_class}.`
+      : r.status === "unknown-model" && r.world_make
+        ? `Not one of the 196 Stanford training classes. The world-car layer is ${pct(r.world_make.p)} sure this is a ${r.world_make.make}, but not sure enough of the model to name it.${r.world_make.candidates.length ? ` Closest models: ${r.world_make.candidates.join(", ")}.` : ""}`
       : r.status === "unknown-model"
         ? `${outside ? "This car does not match any of the 196 supported classes" : "The classifier is not sure this is one of the 196 supported classes"}, so it reports the make only (${pct(r.confidence)} sure) instead of guessing a model. Best unconfirmed guess: ${guess}.`
       : r.status === "unknown"

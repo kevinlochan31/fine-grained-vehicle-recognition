@@ -67,6 +67,17 @@ class WorldCars:
         t = np.load(C.MODELS_DIR / f"world_text_{self.name}.npz", allow_pickle=False)
         self.t_models, self.t_scale = t["t"].astype(np.float32), float(t["scale"])
         self.t_make, self.t_model = [str(x) for x in t["makes"]], [str(x) for x in t["models"]]
+        # grouping of the probe's classes (world + 196 Stanford) by model and by make, for the middle tiers
+        from .data import split_class_name
+        allc = list(self.classes) + [dict(make=m, model=mo, stanford=i) for i, n in enumerate(meta["stanford_classes"])
+                                     for (m, mo, _) in [split_class_name(n)]]
+        mg, mk = class_groups(allc)
+        self.mg_names, self.mk_names = sorted(set(mg)), sorted(set(mk))
+        self.mg_idx = np.array([self.mg_names.index(g) for g in mg]); self.mk_idx = np.array([self.mk_names.index(g) for g in mk])
+        self.world_groups = {g for g, c in zip(mg, allc) if c.get("stanford", -1) < 0}
+        self.make_display = {}
+        for c in allc:
+            self.make_display.setdefault(make_key(c["make"]), c["make"])
         cat = load_world_catalogue()
         self.gens = {}
         for e in cat:
@@ -101,13 +112,47 @@ class WorldCars:
         zmake = {}
         for m, q in zip(self.t_make, pz):
             zmake[make_key(m)] = zmake.get(make_key(m), 0.0) + float(q)
-        return dict(top_is_world=k < self.K, p_top=float(p[k]), stanford_class=(k - self.K) if k >= self.K else -1,
+        # middle tiers
+        pmg = np.bincount(self.mg_idx, weights=p, minlength=len(self.mg_names))
+        pmk = np.bincount(self.mk_idx, weights=p, minlength=len(self.mk_names))
+        gi, ki = int(pmg.argmax()), int(pmk.argmax())
+        g = self.mg_names[gi]
+        # best world class of that model group (for the label and the reference photo)
+        in_g = [i for i in range(self.K) if self.mg_idx[i] == gi]
+        mc = max(in_g, key=lambda i: p[i]) if in_g else None
+        mk_name = self.mk_names[ki]
+        cands = sorted([i for i in range(self.K) if self.mk_idx[i] == ki], key=lambda i: -p[i])
+        seen, cand_names = set(), []
+        for i in cands:
+            nm = self.classes[i]["model"]
+            if nm not in seen:
+                seen.add(nm); cand_names.append(nm)
+        model_tier = None
+        if mc is not None and g in self.world_groups:
+            idx2 = np.where(self.ref_cls == mc)[0]; s2 = self.ref_emb[idx2] @ f
+            model_tier = dict(cls=self.classes[mc], p=float(pmg[gi]), ref=self.refs[int(idx2[int(s2.argmax())])], ref_sim=float(s2.max()))
+        make_tier = dict(make=self.make_display.get(mk_name, mk_name), p=float(pmk[ki]), candidates=cand_names[:3])
+        return dict(model_tier=model_tier, make_tier=make_tier,
+                    top_is_world=k < self.K, p_top=float(p[k]), stanford_class=(k - self.K) if k >= self.K else -1,
                     cls=c, p=float(p[kw]), ref=ref, ref_sim=float(sims.max()),
                     zs_make=self.t_make[zi], zs_model=self.t_model[zi], zs_p=float(pz[zi]),
                     zs_make_probs=zmake)
 
     def generations(self, make: str, model: str) -> list[dict]:
         return self.gens.get((make, model), [])
+
+
+def class_groups(classes: list[dict]):
+    """Per probe class: (model-group key, make key). Generations of one model share a model group; a Stanford
+    class joins the group of its family (make + first model word), e.g. 'toyota|camry'."""
+    import re
+    mg, mk = [], []
+    for c in classes:
+        m = make_key(c["make"])
+        stanford = c.get("stanford", -1) >= 0
+        model = re.split(r"[\s\-]+", c["model"].lower())[0] if stanford else c["model"].lower()
+        mg.append(f"{m}|{model}"); mk.append(m)
+    return mg, mk
 
 
 def describe_world(c: dict) -> str:

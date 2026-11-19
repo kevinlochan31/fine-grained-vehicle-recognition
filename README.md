@@ -96,9 +96,17 @@ sits on the open-set path. It never changes the 196-class models, their outputs 
 |---|---|---|
 | Right make + model + generation | n/a | **53.5%** |
 | Right model (generation not given or wrong) | 20.9% (any) | 9.6% |
-| Right make only ("model not recognised") | 24.2% | 8.6% |
-| "Unknown car" (no claim) | 40.0% | 21.7% |
-| **Wrong** | 14.8% | **6.6%** |
+| Right make only ("model not recognised" + closest models) | 24.2% | 18.0% |
+| "Unknown car" (no claim) | 40.0% | 12.9% |
+| **Wrong** | 14.8% | **6.1%** |
+
+Indian-market cars (212 photos): right generation 42.5%, right model 15.1%, make only 21.2%, unknown 13.2%,
+wrong 8.0%. Rest of the world (300): 61.3% / 5.7% / 15.7% / 12.7% / 4.7%.
+
+If the layer is not sure of the model but is ≥ 90% sure of the make (summed over that make's models), it
+answers e.g. "Maruti Suzuki, model not recognised · closest: Grand Vitara, Fronx, Brezza". That threshold
+gives 96% make precision on reference-photo cross-validation. A model-level tier ("generation not certain")
+never reached 95% precision in tuning, so it stays effectively off (threshold 0.99).
 
 When the layer names a generation it is right **96.9%** of the time (model 97.3%, make 99.0%).
 

@@ -263,6 +263,14 @@ class VehicleRecognizer:
         pred["closest_trained_class"] = pred["label"]
         if world_ok and wm["p"] >= cfg.get("world_name_conf", 1.01):
             return self._world_answer(pred, wm)
+        if wm is not None:
+            mt, kt = wm["model_tier"], wm["make_tier"]
+            # model level: confident about the model, not about which generation
+            if mt is not None and mt["p"] >= cfg.get("world_model_conf", 1.01):
+                return self._world_answer(pred, dict(cls=dict(mt["cls"], gen=None, years="", y0=None), p=mt["p"],
+                                                     ref=mt["ref"], ref_sim=mt["ref_sim"]), level="model")
+        # make level (used below, after the model-naming steps): sure of the make only, closest models as hints
+        world_make = wm is not None and wm["make_tier"]["p"] >= cfg.get("world_make_conf", 1.01)
         V = self.vision
         p_make_cls = np.zeros(len(V.makes)); p_make_cls[self._mk_map] = self._group(probs, self.make_idx, len(self.makes))
         make, make_p, named, within = decide_unfamiliar(
@@ -273,6 +281,8 @@ class VehicleRecognizer:
             # Probably a trained class but the classifier is too unsure for any level of its hierarchy:
             # do not present its top class as the answer; it stays visible in the top-5 list.
             pred["possibly_outside"] = True
+            if world_make:
+                return self._world_make(pred, wm["make_tier"])
             if make_p >= cfg.get("unknown_make_conf", 0.5):
                 pred.update(status="unknown-model", make=make, model="Model not recognised", year="unknown",
                             confidence=make_p, display=f"{make}, model not recognised")
@@ -296,6 +306,8 @@ class VehicleRecognizer:
                         world=dict(make=wm["zs_make"], model=wm["zs_model"], gen=None, years="", y0=None,
                                    source="zero-shot catalogue", p=wm["zs_p"], ref=None),
                         top5=[(l, p) for l, p, _ in zs["name_top5"]])
+        elif world_make:
+            return self._world_make(pred, wm["make_tier"])
         elif make_p >= cfg.get("unknown_make_conf", 0.5):
             pred.update(status="unknown-model", label=f"{make} (unknown model)", make=make,
                         model="Model not recognised", year="unknown", confidence=make_p,
@@ -307,15 +319,25 @@ class VehicleRecognizer:
                         top5=[(l, p) for l, p, _ in zs["name_top5"]])
         return pred
 
-    def _world_answer(self, pred, wm):
+    def _world_make(self, pred, kt):
+        hint = f" · closest: {', '.join(kt['candidates'])}" if kt["candidates"] else ""
+        pred.update(status="unknown-model", label=f"{kt['make']} (model not recognised)", make=kt["make"],
+                    model="Model not recognised", year="unknown", confidence=kt["p"], in_training_set=False,
+                    display=f"{kt['make']}, model not recognised{hint}",
+                    world_make=dict(make=kt["make"], p=kt["p"], candidates=kt["candidates"]))
+        return pred
+
+    def _world_answer(self, pred, wm, level="generation"):
         from .worldcars import describe_world
         c, r = wm["cls"], wm["ref"]
         label = describe_world(c)
-        pred.update(status="world", label=label, make=c["make"], model=c["model"], year=c.get("years") or "unknown",
+        extra = " · generation not certain" if level == "model" else ""
+        pred.update(status="world", label=label, make=c["make"], model=c["model"],
+                    year=c.get("years") or ("generation not certain" if level == "model" else "unknown"),
                     confidence=wm["p"], in_training_set=False,
-                    display=f"{label} · matched from reference photos",
+                    display=f"{label}{extra} · matched from reference photos",
                     world=dict(make=c["make"], model=c["model"], gen=c.get("gen"), years=c.get("years"), y0=c.get("y0"),
-                               source="reference photos", p=wm["p"], ref_similarity=wm["ref_sim"],
+                               level=level, source="reference photos", p=wm["p"], ref_similarity=wm["ref_sim"],
                                ref=dict(image=r["image"], author=r["author"], license=r["license"],
                                         license_url=r["license_url"], source=r["source"], title=r["title"])))
         return pred

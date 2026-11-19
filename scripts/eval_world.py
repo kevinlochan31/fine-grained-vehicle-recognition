@@ -311,6 +311,31 @@ def build(name="b16"):
     grid_name = {round(t, 2): utility(t) for t in np.arange(0.2, 0.96, 0.05)}
     name_conf = max(grid_name, key=lambda t: (round(grid_name[t], 3), t))
 
+    # ---- middle tiers: model (summed over its generations) and make (summed over all its classes).
+    # Threshold = lowest value whose answers are >= 95% correct on the CV positives + leave-models-out negatives.
+    from src.worldcars import class_groups
+    mg, mkk = class_groups(allc)
+    is_world_group = {g for g, c in zip(mg, allc) if c.get("stanford", -1) < 0}
+    ug, umk = sorted(set(mg)), sorted(set(mkk))
+    Gm = np.zeros((len(allc), len(ug))); Gm[np.arange(len(allc)), [ug.index(g) for g in mg]] = 1
+    Gk = np.zeros((len(allc), len(umk))); Gk[np.arange(len(allc)), [umk.index(g) for g in mkk]] = 1
+    cv_p = np.concatenate([softmax(pos_l / T), softmax(neg_l / T)]); cv_t = list(pos_t) + list(neg_t)
+    pm_, pk_ = cv_p @ Gm, cv_p @ Gk
+    truth_g = [mg[t] for t in cv_t]; truth_k = [mkk[t] for t in cv_t]
+
+    def tier(P, labels, truth, allowed=None, prec=0.95):
+        top = P.argmax(1); p = P.max(1)
+        ok = np.array([labels[i] == t for i, t in zip(top, truth)])
+        valid = np.array([allowed is None or labels[i] in allowed for i in top])
+        grid = {}
+        for t in np.arange(0.3, 0.96, 0.05):
+            a = valid & (p >= t)
+            grid[round(t, 2)] = dict(coverage=float(a.mean()), precision=float(ok[a].mean()) if a.any() else None)
+        good = [t for t, v in grid.items() if v["precision"] is not None and v["precision"] >= prec]
+        return (min(good) if good else 0.99), grid
+    model_conf, grid_model = tier(pm_, ug, truth_g, is_world_group)
+    make_conf, grid_make = tier(pk_, umk, truth_k)
+
     # ---- world_route_conf: Stanford val cars answered as a world model must stay <= 0.1%
     pv = softmax(Xs_va @ Wt.T + b)
     kv = pv.argmax(1)
@@ -421,13 +446,15 @@ def build(name="b16"):
         credits.append(f"| {r['make']} {r['model']} ({r['years']}) | `{r['image']}` | {au} | {r['license']} | [Commons]({r['source']}) |")
     (C.PROJECT_ROOT / "docs" / "world_photo_credits.md").write_text("\n".join(credits) + "\n", encoding="utf8")
     cfg.update(world_route_conf=round(float(route_conf), 2), world_name_conf=round(float(name_conf), 2),
+               world_model_conf=round(float(model_conf), 2), world_make_conf=round(float(make_conf), 2),
                world_zs_conf=round(float(zs_conf), 2))
     (C.MODELS_DIR / "hybrid_config.json").write_text(json.dumps(cfg, indent=1))
     R = json.loads(OUT.read_text()) if OUT.exists() else {}
     R["live"] = dict(backbone=" ".join(BACKBONES[name]), method=meta["method"], n_models=K,
                      n_ref=int(ref.sum()), n_test=int(test.sum()),
-                     thresholds=dict(world_route_conf=route_conf, world_name_conf=name_conf, world_zs_conf=zs_conf),
-                     tuning=dict(temperature=T, name_conf_grid=grid_name, route_conf_stanford_val_world_rate=grid_route, zs_conf_grid=grid_zs,
+                     thresholds=dict(world_route_conf=route_conf, world_name_conf=name_conf, world_model_conf=model_conf,
+                                     world_make_conf=make_conf, world_zs_conf=zs_conf),
+                     tuning=dict(temperature=T, name_conf_grid=grid_name, model_conf_grid=grid_model, make_conf_grid=grid_make, route_conf_stanford_val_world_rate=grid_route, zs_conf_grid=grid_zs,
                                  cv_positives=len(pos), leave_models_out_negatives=len(neg)),
                      test_forced_choice=forced, test_named_at_threshold=thr, test_zero_shot_only=zs_forced,
                      stanford_test=stanford_test)

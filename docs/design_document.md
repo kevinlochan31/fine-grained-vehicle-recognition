@@ -319,8 +319,14 @@ For SigLIP, the probe beat 1-NN (80.3% generation), class prototypes (83.0%) and
 the tuned CLIP ViT-B/16, so they did not need re-tuning: gate acceptance on Stanford test is still 99.89%,
 and non-car probes are still rejected.
 
+**Make tier.** When no model is named, probe probabilities summed per make give a make-only answer with the
+closest models as hints, at p ≥ `world_make_conf` = 0.90 (96% make precision on CV + leave-models-out).
+It comes after the model-naming steps, so it never replaces a model name. A model-level tier (summed over
+generations) never reached 95% precision in tuning, so its threshold is 0.99 (effectively off).
+
 **End to end (full app pipeline, 512 held-out photos).** Right make + model + generation 53.5%, right
-model 9.6%, right make only 8.6%, "unknown car" 21.7%, **wrong 6.6%**. Without the layer: right model
+model 9.6%, right make only 18.0%, "unknown car" 12.9%, **wrong 6.1%**. Indian-market subset (212):
+42.5% / 15.1% / 21.2% / 13.2% / 8.0%. Without the layer: right model
 20.9%, make only 24.2%, unknown 40.0%, **wrong 14.8%**. When a generation is named it is right 96.9% of
 the time.
 
