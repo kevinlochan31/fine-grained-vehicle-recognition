@@ -17,3 +17,6 @@ yolo11*.pt
 ~$*
 *.tmp
 Thumbs.db
+
+# reference-photo thumbnails (465 MB, rebuilt by: python -m scripts.train_world build)
+web/world_refs/

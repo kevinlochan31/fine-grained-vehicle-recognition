@@ -284,6 +284,343 @@
   }
  },
  "live": {
+  "backbone": "ViT-B-16-SigLIP webli (fine-tuned)",
+  "method": "SigLIP ViT-B/16 fine-tuned end to end on world reference photos + Stanford train (cosine head)",
+  "hyperparameters": {
+   "epochs": 14,
+   "batch": 48,
+   "lr_backbone": 2e-05,
+   "lr_head": 0.001,
+   "wd": 0.05,
+   "smoothing": 0.1,
+   "warmup": 1,
+   "layer_decay": 0.8
+  },
+  "n_models": 746,
+  "n_ref": 27045,
+  "n_test": 2149,
+  "n_test_round1_frozen": 510,
+  "thresholds": {
+   "world_route_conf": 0.95,
+   "world_name_conf": 0.95,
+   "world_model_conf": 0.99,
+   "world_make_conf": 0.95,
+   "world_doubt_mass": 0.2
+  },
+  "tuning": {
+   "temperature": 0.6575297041519623,
+   "name_conf_grid": {
+    "0.3": 0.14767352479693013,
+    "0.35": 0.1723084794087611,
+    "0.4": 0.1926084626940912,
+    "0.45": 0.21206270369961366,
+    "0.5": 0.23326547933569694,
+    "0.55": 0.24891579843242417,
+    "0.6": 0.26075235364905264,
+    "0.65": 0.2744889097664717,
+    "0.7": 0.2853853065040083,
+    "0.75": 0.29636627746952576,
+    "0.8": 0.30524073294995235,
+    "0.85": 0.3156178405914257,
+    "0.9": 0.3210994015747821,
+    "0.95": 0.3266615332723687
+   },
+   "doubt_mass_grid": {
+    "0.2": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9965304548959136
+    },
+    "0.25": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9961449498843485
+    },
+    "0.3": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.994988434849653
+    },
+    "0.35": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9934464148033925
+    },
+    "0.4": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.992289899768697
+    },
+    "0.45": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9915188897455667
+    },
+    "0.5": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9899768696993061
+    },
+    "0.55": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9892058596761758
+    },
+    "0.6": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9865073245952197
+    },
+    "0.65": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9849653045489591
+    },
+    "0.7": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9826522744795683
+    },
+    "0.75": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9776407093292213
+    },
+    "0.8": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9687740940632228
+    },
+    "0.85": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.9387047031611411
+    },
+    "0.9": {
+     "stanford_val_doubted": 0.0,
+     "unseen_models_caught": 0.8326908249807248
+    }
+   },
+   "model_conf_grid": {
+    "0.3": {
+     "coverage": 0.8975886917960089,
+     "precision": 0.7186969275899336
+    },
+    "0.35": {
+     "coverage": 0.8780487804878049,
+     "precision": 0.7334280303030303
+    },
+    "0.4": {
+     "coverage": 0.8594789356984479,
+     "precision": 0.7465333763302161
+    },
+    "0.45": {
+     "coverage": 0.8417405764966741,
+     "precision": 0.7599604873230161
+    },
+    "0.5": {
+     "coverage": 0.8202605321507761,
+     "precision": 0.7759756715661429
+    },
+    "0.55": {
+     "coverage": 0.8021064301552107,
+     "precision": 0.7887007601935038
+    },
+    "0.6": {
+     "coverage": 0.7846452328159645,
+     "precision": 0.7995407983044861
+    },
+    "0.65": {
+     "coverage": 0.7644124168514412,
+     "precision": 0.8139956490210297
+    },
+    "0.7": {
+     "coverage": 0.7473669623059866,
+     "precision": 0.8247728536992398
+    },
+    "0.75": {
+     "coverage": 0.7301829268292683,
+     "precision": 0.835832226228886
+    },
+    "0.8": {
+     "coverage": 0.7098115299334812,
+     "precision": 0.8494728621632175
+    },
+    "0.85": {
+     "coverage": 0.6826496674057649,
+     "precision": 0.8652050345107593
+    },
+    "0.9": {
+     "coverage": 0.6527161862527716,
+     "precision": 0.8819532908704883
+    },
+    "0.95": {
+     "coverage": 0.5971452328159645,
+     "precision": 0.9064748201438849
+    },
+    "0.97": {
+     "coverage": 0.5550166297117517,
+     "precision": 0.9238451935081149
+    },
+    "0.99": {
+     "coverage": 0.43542128603104213,
+     "precision": 0.950986632718014
+    }
+   },
+   "make_conf_grid": {
+    "0.3": {
+     "coverage": 0.9506651884700665,
+     "precision": 0.9244897959183673
+    },
+    "0.35": {
+     "coverage": 0.933619733924612,
+     "precision": 0.9329078224729108
+    },
+    "0.4": {
+     "coverage": 0.916019955654102,
+     "precision": 0.9399394856278366
+    },
+    "0.45": {
+     "coverage": 0.9016075388026608,
+     "precision": 0.946203504457424
+    },
+    "0.5": {
+     "coverage": 0.8851164079822617,
+     "precision": 0.9534992954438704
+    },
+    "0.55": {
+     "coverage": 0.8702882483370288,
+     "precision": 0.9589171974522293
+    },
+    "0.6": {
+     "coverage": 0.8549057649667405,
+     "precision": 0.9630410115091587
+    },
+    "0.65": {
+     "coverage": 0.8413248337028825,
+     "precision": 0.9667270630868061
+    },
+    "0.7": {
+     "coverage": 0.8242793791574279,
+     "precision": 0.9705783456624075
+    },
+    "0.75": {
+     "coverage": 0.8076496674057649,
+     "precision": 0.9744337680164722
+    },
+    "0.8": {
+     "coverage": 0.7896341463414634,
+     "precision": 0.9775359775359775
+    },
+    "0.85": {
+     "coverage": 0.7680155210643016,
+     "precision": 0.982497293395886
+    },
+    "0.9": {
+     "coverage": 0.7350332594235033,
+     "precision": 0.9866138763197587
+    },
+    "0.95": {
+     "coverage": 0.6815410199556541,
+     "precision": 0.9914599430662872
+    },
+    "0.97": {
+     "coverage": 0.6403824833702882,
+     "precision": 0.9930750919714347
+    },
+    "0.99": {
+     "coverage": 0.5320121951219512,
+     "precision": 0.9958322479812451
+    }
+   },
+   "route_conf_stanford_val_world_rate": {
+    "0.3": 0.0,
+    "0.32": 0.0,
+    "0.34": 0.0,
+    "0.36": 0.0,
+    "0.38": 0.0,
+    "0.4": 0.0,
+    "0.42": 0.0,
+    "0.44": 0.0,
+    "0.46": 0.0,
+    "0.48": 0.0,
+    "0.5": 0.0,
+    "0.52": 0.0,
+    "0.54": 0.0,
+    "0.56": 0.0,
+    "0.58": 0.0,
+    "0.6": 0.0,
+    "0.62": 0.0,
+    "0.64": 0.0,
+    "0.66": 0.0,
+    "0.68": 0.0,
+    "0.7": 0.0,
+    "0.72": 0.0,
+    "0.74": 0.0,
+    "0.76": 0.0,
+    "0.78": 0.0,
+    "0.8": 0.0,
+    "0.82": 0.0,
+    "0.84": 0.0,
+    "0.86": 0.0,
+    "0.88": 0.0,
+    "0.9": 0.0,
+    "0.92": 0.0,
+    "0.94": 0.0,
+    "0.96": 0.0,
+    "0.98": 0.0
+   },
+   "val_positives": 4622,
+   "leave_models_out_negatives": 2594,
+   "held_out_models": 74
+  },
+  "test_forced_choice": {
+   "make": 0.9641693811074918,
+   "model": 0.8608655188459748,
+   "generation": 0.8250348999534667,
+   "n": 2149
+  },
+  "test_forced_choice_round1_photos": {
+   "make": 0.9627450980392157,
+   "model": 0.9274509803921569,
+   "generation": 0.9098039215686274,
+   "n": 510
+  },
+  "test_named_at_threshold": {
+   "coverage": 0.6212191717077711,
+   "precision_generation": 0.9370786516853933,
+   "precision_model": 0.9573033707865168,
+   "precision_make": 0.9977528089887641
+  },
+  "stanford_test": {
+   "n": 8041,
+   "world_answer_rate_at_route_conf": 0.0002487252829250093,
+   "head_top1_on_stanford_test": 0.9572192513368984,
+   "doubted_at_doubt_mass": 0.007337395846287775
+  }
+ },
+ "e2e_world_test": {
+  "n": 2149,
+  "correct_generation": 0.5798045602605864,
+  "correct_model": 0.028385295486272687,
+  "correct_make_only": 0.11912517449976734,
+  "unknown": 0.23127035830618892,
+  "wrong": 0.04141461144718474,
+  "no_car": 0.0
+ },
+ "e2e_world_test_without_world_layer": {
+  "correct_model_or_better": 0.1558864588180549,
+  "correct_make_only": 0.254071661237785,
+  "unknown_or_no_car": 0.395067473243369,
+  "wrong": 0.19497440670079105
+ },
+ "e2e_stanford_test_sample": {
+  "n": 500,
+  "answers_changed": 0.008,
+  "confident_and_correct_without_world": 0.934,
+  "confident_and_correct_with_world": 0.93
+ },
+ "teach_simulation": {
+  "3_photos": {
+   "models": 30,
+   "taught_car_test_photos": 90,
+   "named_right_generation": 0.36666666666666664,
+   "other_photos_wrongly_named_as_taught_car": 0.00019646365422396856
+  },
+  "5_photos": {
+   "models": 30,
+   "taught_car_test_photos": 90,
+   "named_right_generation": 0.43333333333333335,
+   "other_photos_wrongly_named_as_taught_car": 0.0002619515389652914
+  }
+ },
+ "round1_linear_probe": {
   "backbone": "ViT-B-16-SigLIP webli",
   "method": "linear probe over world reference photos + Stanford train (196 classes)",
   "n_models": 175,
@@ -520,39 +857,19 @@
    "probe_top1_on_stanford_test": 0.9461509762467355
   }
  },
- "e2e_world_test": {
-  "n": 512,
-  "correct_generation": 0.609375,
-  "correct_model": 0.076171875,
-  "correct_make_only": 0.13671875,
-  "unknown": 0.126953125,
-  "wrong": 0.05078125,
+ "e2e_test_fgvd": {
+  "n": 1135,
+  "correct_generation": 0.6951541850220264,
+  "correct_model": 0.06079295154185022,
+  "correct_make_only": 0.07136563876651983,
+  "unknown": 0.1436123348017621,
+  "wrong": 0.02907488986784141,
   "no_car": 0.0
  },
- "e2e_world_test_without_world_layer": {
-  "correct_model_or_better": 0.208984375,
-  "correct_make_only": 0.2421875,
-  "unknown_or_no_car": 0.400390625,
-  "wrong": 0.1484375
- },
- "e2e_stanford_test_sample": {
-  "n": 500,
-  "answers_changed": 0.002,
-  "confident_and_correct_without_world": 0.934,
-  "confident_and_correct_with_world": 0.934
- },
- "teach_simulation": {
-  "3_photos": {
-   "models": 30,
-   "taught_car_test_photos": 90,
-   "named_right_generation": 0.36666666666666664,
-   "other_photos_wrongly_named_as_taught_car": 0.00019646365422396856
-  },
-  "5_photos": {
-   "models": 30,
-   "taught_car_test_photos": 90,
-   "named_right_generation": 0.43333333333333335,
-   "other_photos_wrongly_named_as_taught_car": 0.0002619515389652914
-  }
+ "e2e_test_fgvd_without_world_layer": {
+  "correct_model_or_better": 0.03612334801762115,
+  "correct_make_only": 0.14713656387665197,
+  "unknown_or_no_car": 0.652863436123348,
+  "wrong": 0.16387665198237886
  }
 }

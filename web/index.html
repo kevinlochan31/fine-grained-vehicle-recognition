@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/styles.css?v=20261121" />
 </head>
 <body class="is-booting">
   <a class="skip-link" href="#scan">Skip to the scanner</a>
@@ -38,8 +38,13 @@
       <a href="#scan" data-nav="scan"><span class="mono">01</span> Scan</a>
       <a href="#numbers" data-nav="numbers"><span class="mono">02</span> Results</a>
       <a href="#pipeline" data-nav="pipeline"><span class="mono">03</span> Pipeline</a>
+      <a href="#faq" data-nav="faq" class="nav__more"><span class="mono">04</span> FAQ</a>
+      <a href="#team" data-nav="team" class="nav__more"><span class="mono">05</span> Team</a>
     </nav>
-    <span class="nav__status mono" id="status"><i class="dot"></i><span id="status-text">CONNECTING</span></span>
+    <div class="nav__right">
+      <span class="nav__status mono" id="status" title="Model server status"><i class="dot"></i><span id="status-text">CONNECTING</span></span>
+      <a class="nav__cta" href="#scan" data-cursor="Scan">Scan a car <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
   </header>
 
   <main id="top">
@@ -47,6 +52,7 @@
     <section class="hero" id="hero" aria-labelledby="hero-title">
       <canvas class="hero__canvas" id="particles" aria-hidden="true"></canvas>
       <div class="hero__content">
+        <a class="hbadge" href="#team" data-fade><span class="hbadge__tag mono">NEW</span><span>Team Zeta · CV Hackathon 2026 · Problem P5</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         <p class="kicker mono"><span class="blink">●</span> P5 · Stanford Cars · 196 classes · 16,185 images</p>
         <h1 class="hero__title" id="hero-title">
           <span class="line"><span class="word" data-split>See</span> <span class="word" data-split>every</span></span>
@@ -61,6 +67,7 @@
           </a>
           <a class="btn btn--line magnetic" href="#numbers" data-cursor="Data">See the numbers</a>
         </div>
+        <p class="hero__note mono" data-fade>No sign-up · photos never stored · runs on your own GPU or CPU</p>
       </div>
       <dl class="hero__stats" data-fade>
         <div><dt>Top-1 accuracy</dt><dd class="mono" data-count="95.9" data-suffix="%">0</dd></div>
@@ -197,6 +204,51 @@
         <header class="subhead"><span class="mono">X-RAY</span><h3>Inside the classical pipeline</h3></header>
         <div class="layers__grid" id="gallery"></div>
       </div>
+
+      <div class="working" id="explain-section" hidden>
+        <header class="subhead"><span class="mono">SHOW THE WORKING</span><h3>How it saw your image, and how it got the number</h3></header>
+        <div class="working__grid">
+          <article class="wcard wcard--wide">
+            <div class="wcard__head"><span class="mono">A · DIFFERENCE IMAGE</span><b>What the enhancement changed</b></div>
+            <div class="wdiff">
+              <div class="slider" id="x-slider" style="--pos:50%">
+                <img id="x-before" alt="Detected car crop before enhancement"/>
+                <img id="x-after" class="slider__after" alt="Detected car crop after adaptive enhancement"/>
+                <span class="slider__tag slider__tag--l mono">BEFORE</span><span class="slider__tag slider__tag--r mono">AFTER</span>
+                <i class="slider__handle" aria-hidden="true"></i>
+                <input type="range" min="0" max="100" value="50" id="x-range" aria-label="Drag to compare before and after enhancement"/>
+              </div>
+              <figure class="wfig"><img id="x-diff" alt="Difference heat map: brighter means the pixel changed more"/>
+                <figcaption><span class="mono">|after − before|</span> per pixel. Dark = unchanged, bright = changed most.</figcaption></figure>
+            </div>
+            <div class="wstats" id="x-diffstats"></div>
+          </article>
+          <article class="wcard">
+            <div class="wcard__head"><span class="mono">B · GRAD-CAM</span><b>Where the neural network looked</b></div>
+            <figure class="wfig"><img id="x-cam" alt="Grad-CAM heat map over the car"/>
+              <figcaption id="x-camcap"></figcaption></figure>
+          </article>
+          <article class="wcard">
+            <div class="wcard__head"><span class="mono">C · HOG</span><b>What the classical features read</b></div>
+            <div class="wpair"><figure class="wfig"><img id="x-hoggray" alt="Grey, equalised 192 by 128 crop used for HOG"/><figcaption>1. grey + equalised, 192×128</figcaption></figure>
+              <figure class="wfig"><img id="x-hog" alt="HOG gradient-orientation picture"/><figcaption id="x-hogcap"></figcaption></figure></div>
+          </article>
+        </div>
+        <div class="calc">
+          <div class="wcard__head"><span class="mono">D · THE CALCULATION</span><b>Every number, from pixels to the answer</b></div>
+          <ol class="calc__list" id="x-calc"></ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================ WHY HYBRID (21st.dev: bento grid) -->
+    <section class="section why" id="why" aria-labelledby="why-title">
+      <header class="section__head" data-reveal>
+        <span class="section__num mono">∞ / WHY HYBRID</span>
+        <h2 id="why-title">Two kinds of <em>vision</em>, one answer.</h2>
+        <p>Each part does what it is best at, and every part can be checked.</p>
+      </header>
+      <div class="bento" id="bento"></div>
     </section>
 
     <!-- ================================================================ NUMBERS -->
@@ -218,10 +270,22 @@
         <p>Classical computer vision measures and repairs the image, deep networks localise and identify, and a hybrid layer decides what to trust.</p>
       </header>
       <div class="timeline" id="timeline"><div class="timeline__line"><i id="timeline-fill"></i></div><ol id="pipeline-steps"></ol></div>
-      <figure class="arch panel" data-reveal>
-        <div class="panel__bar mono"><span>SYSTEM ARCHITECTURE</span><span>docs/architecture.png</span></div>
+      <section class="flow panel" id="flow" data-reveal aria-labelledby="flow-title">
+        <div class="flow__head">
+          <div class="wcard__head"><span class="mono">LIVE ARCHITECTURE</span><b id="flow-title">One photo, nine stages</b></div>
+          <span class="flow__chip" id="flow-chip">SCAN A CAR TO SEE ITS VALUES</span>
+        </div>
+        <div class="flow__canvas" id="flow-canvas">
+          <svg class="flow__svg" id="flow-svg" aria-hidden="true"></svg>
+          <div class="flow__grid" id="flow-grid"></div>
+        </div>
+        <div class="flow__legend" aria-hidden="true"><span><i style="background:var(--warn)"></i>classical CV</span><span><i style="background:var(--cyan)"></i>deep learning</span><span><i style="background:var(--lime)"></i>hybrid decision</span><span><i style="background:var(--line-3)"></i>dashed: comparison only</span></div>
+        <div class="flow__detail" id="flow-detail" aria-live="polite"></div>
+      </section>
+      <details class="arch panel">
+        <summary>STATIC ARCHITECTURE DIAGRAM (docs/architecture.png)</summary>
         <img src="/docs-assets/architecture.png" alt="System architecture: web UI and FastAPI, validation and quality analysis, YOLO11 detector with enhancement retry and classical fallback, ROI crop, two-view ConvNeXt classifier, temperature scaling, late fusion with classical features, low-confidence back-off, JSON response." loading="lazy" width="2100" height="1000" />
-      </figure>
+      </details>
       <div class="ethics">
         <div class="panel" data-reveal><p class="mono strip__title">LIMITS</p><ul>
           <li>Closed set of 196 Stanford Cars classes, mostly US-market cars 1991-2012. Unknown models map to the nearest class: read the confidence.</li>
@@ -233,11 +297,43 @@
           <li>Below the confidence threshold it backs off to a coarser answer instead of bluffing.</li></ul></div>
       </div>
     </section>
+
+    <!-- ================================================================ FAQ (21st.dev: ghost accordion) -->
+    <section class="section faq" id="faq" aria-labelledby="faq-title">
+      <header class="section__head" data-reveal>
+        <span class="section__num mono">04 / FAQ</span>
+        <h2 id="faq-title">Good <em>questions</em>.</h2>
+      </header>
+      <div class="acc" id="acc"></div>
+    </section>
+
+    <!-- ================================================================ TEAM (21st.dev: team section with glow cards) -->
+    <section class="section team" id="team" aria-labelledby="team-title">
+      <header class="section__head" data-reveal>
+        <span class="section__num mono">05 / TEAM</span>
+        <h2 id="team-title">Team <em>Zeta</em>.</h2>
+        <p>Team ID T80 · RV University · guided by Dr. Sheela S.</p>
+      </header>
+      <div class="crew" id="crew"></div>
+    </section>
   </main>
 
+  <!-- ================================================================ FOOTER (21st.dev: wordmark footer) -->
   <footer class="footer">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a class="logo" href="#top" aria-label="AutoLens, back to top"><span class="logo__mark" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="16" cy="16" r="3.5" fill="currentColor"/><path d="M16 1v6M16 25v6M1 16h6M25 16h6" stroke="currentColor" stroke-width="2.5"/></svg></span><span class="logo__word">AUTOLENS</span></a>
+        <p>Fine-grained vehicle recognition: classical computer vision repairs and explains the image, deep networks name the car, and a calibrated hybrid layer decides what to trust.</p>
+        <p class="footer__status mono"><i class="dot" id="foot-dot"></i><span id="foot-status">Checking the model server…</span></p>
+      </div>
+      <nav class="footer__cols" aria-label="Footer">
+        <div><p class="mono">EXPLORE</p><a href="#scan">Scan a car</a><a href="#numbers">Results</a><a href="#pipeline">Pipeline</a><a href="#faq">FAQ</a></div>
+        <div><p class="mono">PROJECT</p><a href="https://github.com/kevinlochan31/fine-grained-vehicle-recognition" target="_blank" rel="noopener">GitHub repository</a><a href="https://github.com/kevinlochan31/fine-grained-vehicle-recognition/blob/main/docs/design_document.md" target="_blank" rel="noopener">Design document</a><a href="/docs-assets/architecture.png" target="_blank" rel="noopener">Architecture diagram</a><a href="/api/docs" target="_blank" rel="noopener">API docs</a></div>
+        <div><p class="mono">TEAM</p><a href="#team">Team Zeta · T80</a><span>RV University</span><span>Guide: Dr. Sheela S</span></div>
+      </nav>
+    </div>
+    <div class="footer__legal mono"><span>Computer Vision Hackathon 2026 · Problem P5</span><span>Stanford Cars (Krause et al., 2013) · images keep their original licences</span></div>
     <p class="footer__giant" aria-hidden="true">AUTOLENS</p>
-    <p class="mono">Computer Vision Hackathon 2026 · Problem P5 · Stanford Cars (Krause et al., 2013) · images keep their original licences.</p>
   </footer>
 
   <div class="tooltip mono" id="tooltip" role="tooltip"></div>
@@ -252,6 +348,6 @@
   </div>
 
   <script src="/static/vendor/motion.js"></script>
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=20261121d"></script>
 </body>
 </html>

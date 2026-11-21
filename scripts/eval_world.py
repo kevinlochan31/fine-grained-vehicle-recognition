@@ -412,6 +412,17 @@ def build(name="b16"):
                          probe_top1_on_stanford_test=float((kte - K == te.label.values).mean()))
 
     # ---- artefacts
+    rows = write_ref_artefacts(df, ref)
+    meta = dict(backbone=" ".join(BACKBONES[name]), arch=BACKBONES[name][0], pretrained=BACKBONES[name][1], name=name,
+                n_world=K, classes=[{k: c[k] for k in ("key", "make", "model", "gen", "years", "y0", "y1")} for c in wcls],
+                stanford_classes=NAMES, method="linear probe over world reference photos + Stanford train (196 classes)")
+    _build_tail(name, meta, Xr_all, Xs_tr, yr, ys_tr, T, Wt, b, tm, scale, models, cfg, route_conf, name_conf,
+                model_conf, make_conf, zs_conf, K, ref, test, grid_name, grid_model, grid_make, grid_route, grid_zs,
+                pos, neg, forced, thr, zs_forced, stanford_test)
+
+
+def write_ref_artefacts(df, ref):
+    """Reference thumbnails (web/world_refs), data_meta/world_refs.csv and docs/world_photo_credits.md."""
     keep_ref = df[ref].reset_index(drop=True)
     thumbs = C.PROJECT_ROOT / "web" / "world_refs"; thumbs.mkdir(parents=True, exist_ok=True)
     for old in thumbs.glob("*.jpg"):
@@ -426,9 +437,22 @@ def build(name="b16"):
                          image=f"world_refs/{fname}", title=r.title, author=r.author, license=r.license,
                          license_url=r.license_url if isinstance(r.license_url, str) else "", source=r.source))
     pd.DataFrame(rows).to_csv(C.META_DIR / "world_refs.csv", index=False, encoding="utf8")
-    meta = dict(backbone=" ".join(BACKBONES[name]), arch=BACKBONES[name][0], pretrained=BACKBONES[name][1], name=name,
-                n_world=K, classes=[{k: c[k] for k in ("key", "make", "model", "gen", "years", "y0", "y1")} for c in wcls],
-                stanford_classes=NAMES, method="linear probe over world reference photos + Stanford train (196 classes)")
+    credits = ["# Reference photo credits (world-car layer)", "",
+               "The reference thumbnails in `web/world_refs/` are downscaled (320 px) copies of photos from "
+               "[Wikimedia Commons](https://commons.wikimedia.org/), used under their free licences. "
+               "Each is credited below with its author, licence and source page. They are used only by the "
+               "world-car layer, never to evaluate the 196-class Stanford Cars models.", "",
+               "| Car | Thumbnail | Author | Licence | Source |", "|---|---|---|---|---|"]
+    for r in rows:
+        au = (r["author"] or "unknown").replace("|", "/")
+        credits.append(f"| {r['make']} {r['model']} ({r['years']}) | `{r['image']}` | {au} | {r['license']} | [Commons]({r['source']}) |")
+    (C.PROJECT_ROOT / "docs" / "world_photo_credits.md").write_text("\n".join(credits) + "\n", encoding="utf8")
+    return rows
+
+
+def _build_tail(name, meta, Xr_all, Xs_tr, yr, ys_tr, T, Wt, b, tm, scale, models, cfg, route_conf, name_conf,
+                model_conf, make_conf, zs_conf, K, ref, test, grid_name, grid_model, grid_make, grid_route, grid_zs,
+                pos, neg, forced, thr, zs_forced, stanford_test):
     # training set of the probe (for teaching new cars at run time; stays in WORK_DIR, not in the repo)
     np.savez_compressed(W / f"probe_train_{name}.npz", X=np.concatenate([Xr_all, Xs_tr]).astype(np.float16),
                         y=np.concatenate([yr, ys_tr]).astype(np.int32), T=np.float32(T))
@@ -438,16 +462,6 @@ def build(name="b16"):
         old.unlink()
     np.savez_compressed(C.MODELS_DIR / f"world_text_{name}.npz", t=tm.astype(np.float16), scale=np.float32(scale),
                         makes=np.array([a for a, _ in models]), models=np.array([c for _, c in models]))
-    credits = ["# Reference photo credits (world-car layer)", "",
-               "The reference thumbnails in `web/world_refs/` are downscaled (320 px) copies of photos from "
-               "[Wikimedia Commons](https://commons.wikimedia.org/), used under their free licences. "
-               "Each is credited below with its author, licence and source page. They are used only by the "
-               "world-car layer, never to train or evaluate the 196-class Stanford Cars models.", "",
-               "| Car | Thumbnail | Author | Licence | Source |", "|---|---|---|---|---|"]
-    for r in rows:
-        au = (r["author"] or "unknown").replace("|", "/")
-        credits.append(f"| {r['make']} {r['model']} ({r['years']}) | `{r['image']}` | {au} | {r['license']} | [Commons]({r['source']}) |")
-    (C.PROJECT_ROOT / "docs" / "world_photo_credits.md").write_text("\n".join(credits) + "\n", encoding="utf8")
     cfg.update(world_route_conf=round(float(route_conf), 2), world_name_conf=round(float(name_conf), 2),
                world_model_conf=round(float(model_conf), 2), world_make_conf=round(float(make_conf), 2),
                world_zs_conf=round(float(zs_conf), 2))
@@ -516,12 +530,13 @@ def teach_sim(n_models=30, shots=(3, 5)):
 
 
 # ---------------------------------------------------------------------------------------------------- e2e
-def e2e():
+def e2e(test_set="test"):
     from src.pipeline import VehicleRecognizer
     from src.data import read_rgb
     df, wcls = load_world()
     rec = VehicleRecognizer(device="cuda")
-    test = df[df.set == "test"].reset_index(drop=True)
+    test = df[df.set == test_set].reset_index(drop=True)
+    name = "e2e_world_test" if test_set == "test" else f"e2e_{test_set}"     # e.g. e2e_test_fgvd (street photos)
     out, rows = dict(correct_generation=0, correct_model=0, correct_make_only=0, unknown=0, wrong=0, no_car=0), []
     for r in test.itertuples():
         res = rec.run(read_rgb(W / r.file), "hybrid")
@@ -529,7 +544,7 @@ def e2e():
         st = res["status"]
         if st == "no-car":
             k = "no_car"
-        elif st in ("unknown",):
+        elif st in ("unknown", "not-sure"):               # no claim made
             k = "unknown"
         else:
             if res.get("world"):
@@ -551,8 +566,8 @@ def e2e():
         rows.append(dict(file=r.file, truth=f"{t['make']} {t['model']} {t['years']}", shown=res["display"], status=st, outcome=k))
     n = len(test)
     R = json.loads(OUT.read_text()) if OUT.exists() else {}
-    R["e2e_world_test"] = dict(n=n, **{k: v / n for k, v in out.items()})
-    pd.DataFrame(rows).to_csv(W / "e2e_world_test.csv", index=False)
+    R[name] = dict(n=n, **{k: v / n for k, v in out.items()})
+    pd.DataFrame(rows).to_csv(W / f"{name}.csv", index=False)
     # Same photos with the world layer switched off (what the app answered before this feature)
     world, rec.world = rec.world, None
     before = dict(correct_model_or_better=0, correct_make_only=0, unknown_or_no_car=0, wrong=0)
@@ -565,7 +580,11 @@ def e2e():
                  y0=-1, stanford=res["class_id"] if res["in_training_set"] and model else -1)
         j = judge(c, t)
         before["correct_model_or_better" if j[1] else "correct_make_only" if j[0] and not model else "wrong"] += 1
-    R["e2e_world_test_without_world_layer"] = {k: v / n for k, v in before.items()}
+    R[f"{name}_without_world_layer"] = {k: v / n for k, v in before.items()}
+    if test_set != "test":
+        OUT.write_text(json.dumps(R, indent=1))
+        print(json.dumps({k: R[k] for k in (name, f"{name}_without_world_layer")}, indent=1))
+        return
     # Stanford test sample: does the world layer change what users see for the 196 trained classes?
     ann = pd.read_csv(C.META_DIR / "annotations.csv"); te = ann[ann.split == "test"].sample(500, random_state=0)
     changed = right_before = right_after = 0
@@ -587,5 +606,11 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["compare", "build", "e2e", "teach"])
     ap.add_argument("--backbone", default="b16", choices=list(BACKBONES))
+    ap.add_argument("--set", default="test", help="e2e: which held-out set (test = Commons, test_fgvd = street photos)")
     a = ap.parse_args()
-    build(a.backbone) if a.stage == "build" else {"compare": compare, "e2e": e2e, "teach": teach_sim}[a.stage]()
+    if a.stage == "build":
+        build(a.backbone)
+    elif a.stage == "e2e":
+        e2e(a.set)
+    else:
+        {"compare": compare, "teach": teach_sim}[a.stage]()

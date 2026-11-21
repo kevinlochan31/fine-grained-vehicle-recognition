@@ -268,14 +268,29 @@
   new IntersectionObserver((entries) => entries.forEach((e) => {
     if (e.isIntersecting) navLinks.forEach((a) => a.classList.toggle("is-active", a.dataset.nav === e.target.id));
   }), { rootMargin: "-45% 0px -50% 0px" }).observe($("#scan"));
-  ["#numbers", "#pipeline"].forEach((s) => navLinks.length && new IntersectionObserver((entries) => entries.forEach((e) => {
+  ["#numbers", "#pipeline", "#faq", "#team"].forEach((s) => navLinks.length && $(s) && new IntersectionObserver((entries) => entries.forEach((e) => {
     if (e.isIntersecting) navLinks.forEach((a) => a.classList.toggle("is-active", a.dataset.nav === e.target.id));
   }), { rootMargin: "-45% 0px -50% 0px" }).observe($(s)));
   health.then((h) => {
     const d = $("#status .dot");
     d.classList.add(h ? "is-on" : "is-off");
     $("#status-text").textContent = h ? `MODEL ONLINE · ${h.backend.toUpperCase()}` : "API OFFLINE";
+    const fd = $("#foot-dot"); if (fd) fd.classList.add(h ? "is-on" : "is-off");
+    const fs = $("#foot-status"); if (fs) fs.textContent = h ? `Model online · ${h.backend}` : "Model server offline";
   });
+  // floating navbar: denser once you scroll, hides while scrolling down, comes back when scrolling up
+  (() => {
+    const nav = $("#nav"); let lastY = scrollY, ticking = false;
+    window.addEventListener("scroll", () => {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(() => {
+        const y = scrollY;
+        nav.classList.toggle("is-scrolled", y > 40);
+        if (Math.abs(y - lastY) > 6) { nav.classList.toggle("is-hidden", y > lastY && y > 500 && !nav.contains(document.activeElement)); lastY = y; }
+        ticking = false;
+      });
+    }, { passive: true });
+  })();
   $$("[data-reveal]").forEach((el) => {
     if (live) el.style.opacity = 0;
     // panels wipe open like a shutter; headings just rise
@@ -345,6 +360,7 @@
   function setLoading(on) {
     busy = on;
     stage.classList.toggle("is-loading", on); stage.setAttribute("aria-busy", on);
+    $(".panel--out").classList.toggle("is-scanning", on);
     input.disabled = on; $$(".thumb").forEach((t) => (t.disabled = on));
     clearInterval(loadTimer); beamCtl?.stop?.(); beamCtl = null;
     if (!on) return;
@@ -366,7 +382,7 @@
     const url = URL.createObjectURL(file);
     photo.src = url; overlay.innerHTML = ""; $$(".tagline, .coords", viewer).forEach((e) => e.remove());
     $("#stage-empty").hidden = true; viewer.hidden = false;
-    ["#result", "#compare-section", "#steps-section", "#quality-wrap"].forEach((s) => ($(s).hidden = true));
+    ["#result", "#compare-section", "#steps-section", "#explain-section", "#quality-wrap"].forEach((s) => ($(s).hidden = true));
     $("#latency-hint").textContent = "SCANNING";
     anim(viewer, { opacity: [0, 1], scale: [0.96, 1], filter: ["blur(8px)", "blur(0px)"] }, { duration: 0.4 });
     await photo.decode().catch(() => {});
@@ -381,6 +397,7 @@
       await minScan;
       if (!res.ok) throw new Error(data.detail || `Server error (${res.status}).`);
       photo.src = data.image; await photo.decode().catch(() => {});
+      viewer.classList.toggle("is-landscape", photo.naturalWidth >= photo.naturalHeight * 1.05);
       setLoading(false);
       render(data);
     } catch (err) {
@@ -397,6 +414,7 @@
     "low-confidence": { cls: "low", tone: "is-low", text: "Low confidence", icon: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>' },
     "world": { cls: "cyan", tone: "is-cyan", text: "World car", icon: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>' },
     "open-set": { cls: "cyan", tone: "is-cyan", text: "Unseen model", icon: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>' },
+    "not-sure": { cls: "serious", tone: "is-warn", text: "Not sure", icon: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>' },
     "unknown-model": { cls: "serious", tone: "is-warn", text: "Unknown model", icon: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>' },
     "unknown": { cls: "low", tone: "is-low", text: "Outside supported classes", icon: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>' },
     "no-car": { cls: "low", tone: "is-low", text: "No car", icon: '<circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>' },
@@ -427,6 +445,7 @@
     $("#r-facts").innerHTML = [["Vehicle score (CLIP)", pct(r.car_probability)], ["Latency", `${Math.round(r.timings.total_ms)} ms`]]
       .map(([k, v]) => `<div class="fact"><span>${k}</span><b>${esc(v)}</b></div>`).join("");
     $("#top5-wrap").hidden = true; $("#r-world").hidden = true; $("#teach").hidden = true;
+    renderFlow(d);
     anim([...res.children], { opacity: [0, 1], y: [20, 0] }, { duration: 0.5, delay: stagger(0.1), ease: EASE });
   }
   /* teach AutoLens: add your own photos of a car (only that car's entry is retrained) */
@@ -456,8 +475,9 @@
     } catch { /* list is optional */ }
   }
   function prefillTeach(r) {
-    const box = $("#teach"); box.hidden = false;
-    const w = r.world, wk = r.world_make;
+    // Manual teaching is switched off in the UI: AutoLens learns by itself from photos it is very sure about.
+    const box = $("#teach"); box.hidden = true; return;
+    const w = r.world || r.best_guess, wk = r.world_make;
     if (w) { $("#teach-make").value = w.make; $("#teach-model").value = w.model; }
     else if (wk) { $("#teach-make").value = wk.make; $("#teach-model").value = ""; }
     else { $("#teach-make").value = ""; $("#teach-model").value = ""; }
@@ -610,8 +630,10 @@
     const open = r.status === "open-set";
     const world = r.status === "world" && r.world;                 // named by the world-car layer
     const unk = r.status === "unknown" || r.status === "unknown-model";
+    const doubt = r.status === "not-sure" && r.not_sure;            // the two models disagree: no answer
     const outside = open || (unk && !r.possibly_outside);          // CLIP says: not one of the 196 classes
     $("#top5-title").textContent = world ? "196-CLASS MODEL · CANDIDATES IT REJECTED"
+      : doubt ? "POSSIBLE MATCHES · UNCONFIRMED"
       : open ? "OPEN-VOCABULARY CANDIDATES · CLIP"
       : unk ? (outside ? "CLOSEST CATALOGUE MATCHES · UNCONFIRMED" : "CLOSEST TRAINED CLASSES · UNCONFIRMED")
       : "TOP-5 CANDIDATES · HYBRID";
@@ -621,6 +643,10 @@
     else if (r.status === "year-uncertain") { const bm = r.best_makemodel || ""; mk = r.make; md = bm.startsWith(mk) ? bm.slice(mk.length).trim() : r.model; yr = "YEAR ?"; }
     else if (unk) { mk = r.make || "Make unclear"; md = r.status === "unknown" ? "Unknown car" : "Unknown model"; yr = "YEAR N/A"; }
     else if (world) { mk = r.world.make; md = r.world.model + (r.world.gen ? ` · ${r.world.gen}` : ""); yr = r.world.years || "GEN ?"; }
+    else if (doubt) { mk = r.make || "Make unclear"; md = "Not sure"; yr = "YEAR ?"; }
+    // No answer claimed, but the world-car layer has a favourite: show it, clearly marked as a guess.
+    const bg = (unk || doubt) && r.best_guess;
+    if (bg) { mk = r.make || `${bg.make}?`; md = `Maybe ${bg.model}?`; yr = bg.years ? `${bg.years} ?` : "YEAR ?"; }
     renderWorld(world ? r : {});
     prefillTeach(r);
     drawTarget(d, r, st);
@@ -638,10 +664,16 @@
     const badge = $("#r-badge"); badge.className = `badge badge--${st.cls}`; badge.innerHTML = `${icon(st.icon)}<span>${st.text}</span>`;
     const t = d.thresholds.confidence;
     const guess = r.top5.length ? `${r.top5[0].label} (${pct(r.top5[0].p)})` : "";
-    $("#r-threshold").textContent = world
+    const bgNote = bg ? ` Best guess from reference photos: ${bg.label} (${pct(bg.p)} sure), not confirmed.` : "";
+    const learnNote = d.self_learnt ? " AutoLens was very sure of this car, so it kept this photo to learn from (self-learning)." : "";
+    $("#r-threshold").textContent = (world
       ? (r.world.ref
         ? `Not one of the 196 Stanford training classes. The separate world-car layer matched it to reference photos (${pct(r.confidence)} sure). Closest trained class: ${r.closest_trained_class}.`
         : `Not one of the 196 Stanford training classes. The world-car layer named the model zero-shot from its ~2,000-model catalogue (${pct(r.confidence)} sure); with no reference photo it does not claim a generation.`)
+      : doubt && r.not_sure.kind === "guess"
+      ? `Not sure, so no answer is claimed. No reference photo matched this car closely enough; matching the photo against car names gives ${r.not_sure.guess} (${pct(r.not_sure.guess_p)}), and the closest reference-photo match is ${r.not_sure.world} (${pct(r.not_sure.world_p)}). Text-only guesses like this are right only about half the time, so treat them as hints.`
+      : doubt
+      ? `Not sure, so no answer is claimed. The 196-class model said ${r.not_sure.classifier} (${pct(r.not_sure.classifier_p)}), but the world-car layer is ${pct(r.not_sure.world_mass)} sure this car is not one of those 196 classes; its closest match is ${r.not_sure.world} (${pct(r.not_sure.world_p)}).`
       : open
       ? `Not one of the 196 training classes, so it was named open-vocabulary by CLIP from ~950 catalogued models. Closest trained class: ${r.closest_trained_class}.`
       : r.status === "unknown-model" && r.world_make
@@ -652,7 +684,7 @@
         ? `${outside ? "This car does not match any of the 196 supported classes" : "The classifier is not sure enough to name this car"} and even the make is unclear, so no make or model is claimed. Best unconfirmed guess: ${guess}.`
       : r.status === "confident"
         ? `Above the ${pct(t, 0)} acceptance threshold (98.5% precision on validation).`
-        : `Below the ${pct(t, 0)} threshold, so it backs off: ${r.display}.`;
+        : `Below the ${pct(t, 0)} threshold, so it backs off: ${r.display}.`) + bgNote + learnNote;
     $("#gauge-label").textContent = unk ? "MAKE %" : "CONF %";
     const g = $("#gauge"), C = 2 * Math.PI * 52;
     g.setAttribute("class", `gauge__fg ${st.tone}`); g.style.strokeDasharray = `${C}`;
@@ -662,7 +694,7 @@
     $("#r-facts").innerHTML = [
       world ? ["In training set", `No · world layer (${r.world.ref ? (r.world.source || "reference photos") : "zero-shot"})`]
       : open ? ["In training set", "No · open-vocabulary"]
-        : unk ? ["Closest trained class", r.closest_trained_class || "-"]
+        : unk || doubt ? ["Closest trained class", r.closest_trained_class || "-"]
         : ["Make-level", `${r.best_make} · ${pct(r.make_confidence)}`],
       ["Vehicle score", pct(r.car_probability)],
       ["Detector", `${r.det_source} · ${r.det_conf.toFixed(2)}`],
@@ -686,10 +718,12 @@
     };
     const order = ["classical", "deep", "hybrid"].filter((m) => d.results[m]);
     $("#compare").innerHTML = order.map((m, i) => {
-      const x = d.results[m], same = x.label === r.label;
+      // hybrid shows what it actually claims ("Not sure · …", "Unknown car", a world car), not its raw top class
+      const claim = (y) => ["not-sure", "unknown", "unknown-model", "world", "open-set"].includes(y.status) ? y.display : y.label;
+      const x = d.results[m], same = claim(x) === claim(r);
       return `<article class="fighter fighter--${m}"><span class="fighter__num" aria-hidden="true">0${i + 1}</span>
         <span class="fighter__tag">${META[m][0]}</span>
-        <div class="fighter__name">${esc(x.label)}</div>
+        <div class="fighter__name">${esc(claim(x))}</div>
         <p class="fighter__desc">${META[m][1]}</p>
         <div class="fighter__stats"><span>CONF <b>${pct(x.confidence)}</b></span><span><b>${Math.round(x.timings.total_ms)}</b> MS</span></div>
         ${m === "hybrid" ? '<span class="agree is-yes">' + icon('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>') + "reference</span>" :
@@ -711,6 +745,58 @@
     layers.forEach((b) => b.addEventListener("click", () => openModal(d.steps[+b.dataset.i], b)));
     if (live) layers.forEach((l) => (l.style.opacity = 0));
     onView($("#gallery"), () => anim(layers, { opacity: [0, 1], scale: [0.85, 1], rotate: [-3, 0] }, { duration: 0.6, delay: stagger(0.07), ease: EASE }), 0.15);
+    renderExplain(d.explain);
+    renderFlow(d); addGlow();
+  }
+
+  /* =============================================================== show the working */
+  const f4 = (v) => (v == null ? "-" : (+v).toFixed(4));
+  function calcStep(s) {
+    let body = "";
+    if (s.rules) body = `<ul class="rules">${s.rules.map((r) => `<li class="${r.fired ? "is-fired" : ""}"><span>${esc(r.rule)}</span><b class="mono">${esc(r.value)}</b><em class="mono">${r.fired ? "APPLIED" : "skip"}</em></li>`).join("")}</ul>`;
+    if (s.values) body += `<div class="kv">${s.values.map((v) => `<div><span>${esc(v.k)}</span><b class="mono">${esc(String(v.v))}</b></div>`).join("")}</div>`;
+    if (s.table) body += `<div class="tscroll"><table><thead><tr><th>Class</th><th class="num">ConvNeXt raw</th><th class="num">ConvNeXt T</th><th class="num">CLIP raw</th><th class="num">CLIP T</th><th class="num">Final</th></tr></thead><tbody>${
+      s.table.map((r) => `<tr><td>${esc(r.label)}</td><td class="num">${f4(r.convnext_raw)}</td><td class="num">${f4(r.convnext)}</td><td class="num">${f4(r.clip_raw)}</td><td class="num">${f4(r.clip)}</td><td class="num"><b>${f4(r.final)}</b></td></tr>`).join("")}</tbody></table></div>`;
+    if (s.formula) body += `<div class="formula mono"><span>${esc(s.label)}</span><code>${esc(s.formula)}</code></div>`;
+    if (s.levels) body += `<ul class="levels">${s.levels.map((l) => `<li class="${l.ok ? "is-ok" : ""}"><div class="levels__top"><span>${esc(l.level)}</span><b class="mono">${(l.p * 100).toFixed(1)}% ${l.ok ? "≥" : "<"} ${Math.round(l.threshold * 100)}%</b></div><div class="levels__name">${esc(l.name)}</div><div class="levels__bar"><i style="--p:${Math.max(0.004, l.p)}"></i><s style="left:${l.threshold * 100}%"></s></div></li>`).join("")}</ul>`;
+    return `<li class="cstep"><h4>${esc(s.title)}</h4><p>${esc(s.text)}</p>${body}</li>`;
+  }
+  function renderExplain(x) {
+    const sec = $("#explain-section");
+    if (!x) { sec.hidden = true; return; }
+    $("#x-before").src = x.before; $("#x-after").src = x.after; $("#x-diff").src = x.diff;
+    const sl = $("#x-slider"), rg = $("#x-range");
+    rg.value = 50; sl.style.setProperty("--pos", "50%");
+    rg.oninput = () => sl.style.setProperty("--pos", `${rg.value}%`);
+    $("#x-diffstats").innerHTML = [
+      ["Steps applied", x.enh_steps.length ? x.enh_steps.join(", ") : "none: image quality was already fine"],
+      ["Mean change", `${x.mean_change} / 255`], ["Largest change", `${x.max_change} / 255`], ["Pixels changed > 10", `${x.changed_pct}%`],
+    ].map(([k, v]) => `<div class="fact"><span>${k}</span><b>${esc(v)}</b></div>`).join("");
+    const cam = $("#x-cam"), camCard = cam.closest(".wcard");
+    if (x.cam) {
+      camCard.hidden = false; cam.src = x.cam;
+      $("#x-camcap").textContent = `Red = regions that pushed the ConvNeXt score for "${x.cam_label}" up the most (gradient-weighted activations of its last stage).`;
+    } else camCard.hidden = true;
+    $("#x-hog").src = x.hog; $("#x-hoggray").src = x.hog_gray;
+    $("#x-hogcap").textContent = `2. ${x.hog_cells} cells of 8×8 px, each a 9-bin histogram of edge directions`;
+    $("#x-calc").innerHTML = x.calc.map(calcStep).join("");
+    sec.hidden = false;
+    const cards = $$("#explain-section .wcard, #x-calc .cstep");
+    if (live) cards.forEach((c) => (c.style.opacity = 0));
+    onView(sec, () => {
+      anim(cards, { opacity: [0, 1], y: [30, 0] }, { duration: 0.55, delay: stagger(0.06), ease: EASE });
+      $$("#x-calc .levels__bar i").forEach((el, i) => anim(el, { scaleX: [0, Math.max(0.004, +el.style.getPropertyValue("--p"))] }, { type: "spring", stiffness: 110, damping: 14, delay: 0.5 + i * 0.1 }));
+      if (live) {                       // one demo sweep of the before/after divider: 50 -> 10 -> 90 -> 50
+        const t0 = performance.now() + 400, D = 1800;
+        const step = (now) => {
+          const t = Math.min(1, Math.max(0, (now - t0) / D));
+          const v = 50 - 40 * Math.sin(t * Math.PI * 2);
+          sl.style.setProperty("--pos", `${v}%`); rg.value = v;
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    }, 0.1);
   }
 
   /* =============================================================== modal */
@@ -812,7 +898,7 @@
       })()) : "",
       card("Model optimisation", O ? `${O.classifier_params_M} M-PARAM CONVNEXT-T` : "OPTIMISATION", optHtml, true),
     ].join("");
-    bindTips(charts);
+    bindTips(charts); addGlow(charts);
     $$(".chart", charts).forEach((c) => {
       tiltSoft(c, 0.22);
       if (live) c.style.opacity = 0;
@@ -1009,11 +1095,194 @@
     if (live) letters.forEach((l) => (l.style.transform = "translateY(100%)"));
     onView(g, () => anim(letters, { y: ["100%", "0%"], rotate: [10, 0], opacity: [0, 1] }, { type: "spring", stiffness: 120, damping: 14, delay: stagger(0.05) }), 0.3);
     if (FINE && live) letters.forEach((l) => l.addEventListener("pointerenter", () => {
-      M.animate(l, { y: [0, -40, 0], rotate: [0, -6, 0], color: ["rgba(198,255,61,0)", "rgba(198,255,61,1)", "rgba(198,255,61,0)"] }, { duration: 0.7, ease: [0.22, 1, 0.36, 1] });
+      M.animate(l, { y: [0, -40, 0], rotate: [0, -6, 0], color: ["#05070d", "#c6ff3d", "#05070d"] }, { duration: 0.7, ease: [0.22, 1, 0.36, 1] });
     }));
   })();
 
+  /* =============================================================== 21st.dev-inspired layer */
+  // Glowing Effect (Aceternity): the border arc nearest the pointer lights up, fading in as the pointer approaches
+  const GLOW_SEL = ".panel, .fighter, .wcard, .calc, .tstep, .big, .layer, .bcard, .mate";
+  const glowEls = new Set();
+  function addGlow(root = document) {
+    if (!FINE || !live) return;
+    $$(GLOW_SEL, root).forEach((el) => {
+      if (el._glow) return;
+      const g = document.createElement("span"); g.className = "glow"; g.setAttribute("aria-hidden", "true");
+      el.appendChild(g); el._glow = g; glowEls.add(el);
+      if (getComputedStyle(el).position === "static") el.style.position = "relative";
+    });
+  }
+  if (FINE && live) {
+    let px = -1e4, py = -1e4, raf = 0;
+    const PROX = 90;
+    const tick = () => {
+      raf = 0;
+      glowEls.forEach((el) => {
+        if (!el.isConnected) { glowEls.delete(el); return; }
+        const r = el.getBoundingClientRect(), g = el._glow;
+        if (!r.width || r.bottom < 0 || r.top > innerHeight) { if (g._o) { g.style.setProperty("--go", 0); g._o = 0; } return; }
+        const dx = Math.max(r.left - px, 0, px - r.right), dy = Math.max(r.top - py, 0, py - r.bottom);
+        const o = Math.max(0, 1 - Math.hypot(dx, dy) / PROX);
+        if (o > 0) {
+          const a = Math.atan2(px - (r.left + r.width / 2), -(py - (r.top + r.height / 2))) * 180 / Math.PI;
+          g.style.setProperty("--ga", `${a.toFixed(1)}deg`);
+        }
+        if (Math.abs(o - (g._o || 0)) > 0.02 || (o === 0 && g._o)) { g.style.setProperty("--go", o.toFixed(2)); g._o = o; }
+      });
+    };
+    const req = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    document.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; req(); }, { passive: true });
+    window.addEventListener("scroll", req, { passive: true });
+    document.addEventListener("pointerleave", () => { px = py = -1e4; req(); });
+  }
+
+  // Border Beam (Magic UI): light runs around the output panel while a scan is in progress
+  function addBeam(el, cls = "") {
+    if (!el || el.querySelector(":scope > .bbeam")) return;
+    const b = document.createElement("span"); b.className = `bbeam ${cls}`.trim(); b.setAttribute("aria-hidden", "true"); el.appendChild(b);
+  }
+  addBeam($(".panel--out"));
+
+  // Animated Beam (Magic UI): live architecture diagram with light pulses running along its connectors
+  const FLOW = [
+    { id: "photo", c: 1, k: "io", t: "Your photo", d: "Any JPG, PNG or WebP up to 15 MB. Nothing is stored: the image lives in memory for one request." },
+    { id: "measure", c: 2, k: "classical", t: "Validate + measure", d: "Rejects empty, tiny or blank files, then measures brightness, contrast, Immerkaer noise, Laplacian sharpness and resolution. These numbers decide which enhancement runs." },
+    { id: "detect", c: 3, k: "deep", t: "YOLO11s detector", d: "Fine-tuned on Stanford Cars boxes (mAP@0.5 0.989, mean IoU 0.954). Boxes are ranked by confidence × √area, so the main car wins. No box? The frame is enhanced and detection retried." },
+    { id: "gate", c: 4, k: "hybrid", t: "Vehicle gate", d: "CLIP ViT-B/16 compares the photo with 21 car and 47 non-car prompts. Accept if P(car) ≥ 0.9, or ≥ 0.5 when the detector agrees. Anything else stops here: \"No car detected\"." },
+    { id: "enhance", c: 5, k: "classical", t: "Crop + enhance", d: "Crop with 8% margin, then only the repairs the measurements call for: bicubic upscale, bilateral denoise, gamma, CLAHE. Both the original and the enhanced crop are classified." },
+    { id: "convnext", c: 6, r: 1, k: "deep", t: "ConvNeXt-Tiny", d: "ImageNet-22k backbone fine-tuned on the 196 classes (95.7% validation). Runs on the crop and its mirror image; softmax calibrated with T = 0.65." },
+    { id: "clip", c: 6, r: 2, k: "deep", t: "CLIP ViT-B/16 (tuned)", d: "CLIP's image encoder fine-tuned with harsh lighting, blur, JPEG and occlusion augmentation (zero-shot 87.2% → 96.7%). Calibrated with T = 0.5." },
+    { id: "classical", c: 6, r: 3, k: "classical", dim: true, t: "HOG · LBP → LogReg", d: "The transparent baseline: 6,428 hand-crafted features (HOG, LBP, colour, edges, geometry) → PCA 256 → logistic regression. 14.5% top-1. Shown for comparison; its fusion weight is 0." },
+    { id: "fuse", c: 7, k: "hybrid", t: "Calibrate + ensemble", d: "Final = 0.3 × ConvNeXt + 0.7 × CLIP, weights chosen on the validation split. Hybrid test accuracy: 95.90% top-1, 99.75% top-5, calibration error 0.011." },
+    { id: "answer", c: 8, k: "hybrid", t: "Back-off → answer", d: "Exact class if ≥ 67%, otherwise make + model, then make only. An open-set check flags cars outside the 196 classes and answers make-first instead of guessing." },
+  ];
+  const EDGES = [["photo", "measure"], ["measure", "detect"], ["detect", "gate"], ["gate", "enhance"], ["enhance", "convnext"], ["enhance", "clip"],
+    ["enhance", "classical", 1], ["convnext", "fuse"], ["clip", "fuse"], ["classical", "fuse", 1], ["fuse", "answer"]];
+  const KLABEL = { io: "input", classical: "classical", deep: "deep", hybrid: "hybrid" };
+  const flow = (() => {
+    const grid = $("#flow-grid"), svg = $("#flow-svg"), canvas = $("#flow-canvas"), detail = $("#flow-detail");
+    if (!grid) return { set() {} };
+    grid.innerHTML = FLOW.map((n) => `<button class="fnode${n.dim ? " is-dim" : ""}" type="button" data-id="${n.id}" data-c style="--c:${n.c};--r:${n.r || 2}">
+      <span class="fnode__k k-${n.k === "io" ? "hybrid" : n.k}">${KLABEL[n.k]}</span><span class="fnode__t">${esc(n.t)}</span><span class="fnode__v mono" data-v>-</span></button>`).join("");
+    const nodes = Object.fromEntries($$(".fnode", grid).map((b) => [b.dataset.id, b]));
+    let anims = [], paths = [], visible = !live;
+    const show = (id) => {
+      const n = FLOW.find((x) => x.id === id), v = nodes[id].querySelector("[data-v]").textContent;
+      detail.innerHTML = `<b>${esc(n.t)}</b><p>${esc(n.d)}</p>${v && v !== "-" ? `<p class="mono" style="color:var(--lime)">Last scan: ${esc(v)}</p>` : ""}`;
+      $$(".fnode", grid).forEach((b) => b.classList.toggle("is-sel", b.dataset.id === id));
+      paths.forEach((p) => p.base.classList.toggle("is-hot", p.a === id || p.b === id));
+    };
+    Object.entries(nodes).forEach(([id, b]) => { b.addEventListener("mouseenter", () => show(id)); b.addEventListener("focus", () => show(id)); b.addEventListener("click", () => show(id)); });
+    const draw = () => {
+      anims.forEach((a) => a.cancel()); anims = [];
+      const cr = canvas.getBoundingClientRect(); if (!cr.width) return;
+      svg.setAttribute("viewBox", `0 0 ${cr.width} ${cr.height}`);
+      const box = (id) => { const r = nodes[id].getBoundingClientRect(); return { l: r.left - cr.left, r: r.right - cr.left, t: r.top - cr.top, b: r.bottom - cr.top, cx: r.left - cr.left + r.width / 2, cy: r.top - cr.top + r.height / 2 }; };
+      const level = Object.fromEntries(FLOW.map((n) => [n.id, n.c]));
+      svg.innerHTML = ""; paths = [];
+      EDGES.forEach(([a, b, dim]) => {
+        const s = box(a), t = box(b);
+        let d;
+        if (t.l >= s.r - 2) { const x1 = s.r, y1 = s.cy, x2 = t.l, y2 = t.cy, m = (x2 - x1) / 2; d = `M${x1} ${y1} C${x1 + m} ${y1} ${x2 - m} ${y2} ${x2} ${y2}`; }
+        else { const x1 = s.cx, y1 = s.b, x2 = t.cx, y2 = t.t, m = (y2 - y1) / 2; d = `M${x1} ${y1} C${x1} ${y1 + m} ${x2} ${y2 - m} ${x2} ${y2}`; }
+        const mk = (cls) => { const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", d); p.setAttribute("class", cls); svg.appendChild(p); return p; };
+        const base = mk(`base${dim ? " is-dim" : ""}`);
+        const kind = FLOW.find((n) => n.id === b).k;
+        const rec = { a, b, base };
+        if (live) {
+          const pulse = mk(`pulse k-${kind === "io" ? "hybrid" : kind}`), len = pulse.getTotalLength(), seg = Math.min(54, len * 0.6);
+          pulse.style.strokeDasharray = `${seg} ${len + seg}`; pulse.style.strokeDashoffset = seg;
+          if (dim) pulse.style.opacity = 0.45;
+          const D = 3400;
+          const an = pulse.animate([{ strokeDashoffset: seg, offset: 0 }, { strokeDashoffset: -len, offset: 0.42 }, { strokeDashoffset: -len, offset: 1 }],
+            { duration: D, delay: (level[a] - 1) * 420, iterations: Infinity, easing: "cubic-bezier(.45,0,.25,1)" });
+          if (!visible) an.pause();
+          anims.push(an);
+        }
+        paths.push(rec);
+      });
+    };
+    let t = 0;
+    const redraw = () => { clearTimeout(t); t = setTimeout(draw, 60); };
+    new ResizeObserver(redraw).observe(canvas);
+    document.fonts?.ready.then(redraw);
+    if (live) new IntersectionObserver((es) => es.forEach((e) => { visible = e.isIntersecting; anims.forEach((a) => (visible ? a.play() : a.pause())); }), { rootMargin: "100px" }).observe(canvas);
+    show("photo");
+    return {
+      set(vals, isLive) {
+        Object.entries(vals).forEach(([id, v]) => { const el = nodes[id]?.querySelector("[data-v]"); if (!el) return; el.classList.toggle("is-live", isLive && v !== "-"); scramble(el, v, 600); });
+        const chip = $("#flow-chip"); chip.textContent = isLive ? "LIVE · YOUR LAST SCAN" : "SCAN A CAR TO SEE ITS VALUES"; chip.classList.toggle("is-live", isLive);
+        setTimeout(() => { redraw(); show($(".fnode.is-sel", grid)?.dataset.id || "photo"); }, 700);
+      },
+    };
+  })();
+  function renderFlow(d) {
+    const r = d.results.hybrid, q = d.quality, dash = "-";
+    const vals = Object.fromEntries(FLOW.map((n) => [n.id, dash]));
+    vals.photo = `${d.width}×${d.height} px`;
+    vals.measure = `b ${q.brightness} · c ${q.contrast} · σ ${q.noise}`;
+    vals.gate = `P(car) ${pct(r.car_probability)}`;
+    if (d.no_car) { vals.answer = "No car detected"; flow.set(vals, true); return; }
+    vals.detect = `${r.det_source} · ${r.det_conf.toFixed(2)}`;
+    vals.enhance = r.enhancement_steps.length ? r.enhancement_steps.join(", ") : "no repair needed";
+    const tbl = d.explain?.calc?.find((s) => s.id === "members")?.table?.[0];
+    if (tbl) { vals.convnext = `${pct(tbl.convnext)} ${tbl.label.split(" ")[0]}`; vals.clip = `${pct(tbl.clip)} ${tbl.label.split(" ")[0]}`; vals.fuse = `→ ${pct(tbl.final)}`; }
+    const c = d.results.classical;
+    if (c) vals.classical = `${pct(c.confidence)} · ${c.label === r.label ? "agrees" : "differs"}`;
+    vals.answer = `${r.display}`;
+    flow.set(vals, true);
+  }
+
+  /* =============================================================== why hybrid: bento grid */
+  const ICON = {
+    eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    brain: '<path d="M9 3a3 3 0 0 0-3 3v.5A3 3 0 0 0 4 9.3 3 3 0 0 0 5 15a3 3 0 0 0 4 3.8V3zM15 3a3 3 0 0 1 3 3v.5a3 3 0 0 1 2 2.8 3 3 0 0 1-1 5.7 3 3 0 0 1-4 3.8V3z"/>',
+    shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+    layers: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+    gate: '<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/>',
+    bolt: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+  };
+  const BENTO = [
+    { w: 1, ic: "eye", k: "classical", badge: "Classical", t: "Classical eyes", m: "5 rules", big: "+4.2 pts", p: "Measures brightness, contrast, noise and resolution, then repairs only what is broken: gamma, CLAHE, bilateral denoise, upscale. Cropping to the detected car alone is worth +4.2 points.", tags: ["#CLAHE", "#gamma", "#HOG", "#LBP"] },
+    { w: 0, ic: "brain", k: "deep", badge: "Deep", t: "Deep memory", m: "2 networks", big: "95.90%", p: "ConvNeXt-Tiny and a fine-tuned CLIP ViT-B/16 vote; their calibrated average is right on 95.90% of 8,041 unseen test photos.", tags: ["#ConvNeXt", "#CLIP"] },
+    { w: 0, ic: "shield", k: "hybrid", badge: "Honest", t: "Knows when it is unsure", m: "3 levels", big: "0.011", p: "Calibrated confidence (error 0.011). Below 67% it backs off to make + model, then make only, instead of bluffing.", tags: ["#calibration", "#back-off"] },
+    { w: 1, ic: "layers", k: "hybrid", badge: "New", t: "Shows its working", m: "4 views", big: "Grad-CAM", p: "Every scan shows where the network looked, what the enhancement changed, the HOG features and each number from pixels to the final answer.", tags: ["#Grad-CAM", "#difference image", "#step-by-step"] },
+    { w: 0, ic: "gate", k: "deep", badge: "Gate", t: "Cars only", m: "16 / 16", big: "99.89%", p: "A CLIP vehicle gate accepts 99.89% of real cars and rejected every non-car probe photo we tried.", tags: ["#open-set"] },
+    { w: 1, ic: "bolt", k: "classical", badge: "Optimised", t: "Fast and small", m: "INT8", big: "150 ms", p: "About 150 ms per photo on a laptop GPU. The INT8 ConvNeXt is 27.3 MB and loses only 0.14 points; FP16 weights are 53.4 MB.", tags: ["#FP16", "#INT8", "#pruning"] },
+  ];
+  $("#bento").innerHTML = BENTO.map((b) => `<article class="bcard${b.w ? " is-wide" : ""}">
+      <div class="bcard__top"><span class="bcard__icon t-${b.k}">${icon(ICON[b.ic], 20)}</span><span class="bcard__badge t-${b.k}">${b.badge}</span></div>
+      <div class="bcard__big t-${b.k}">${b.big}</div>
+      <h3>${b.t}<small>${b.m}</small></h3><p>${b.p}</p>
+      <div class="bcard__tags">${b.tags.map((t) => `<span>${t}</span>`).join("")}</div></article>`).join("");
+  {
+    const cards = $$("#bento .bcard");
+    if (live) cards.forEach((c) => (c.style.opacity = 0));
+    onView($("#bento"), () => anim(cards, { opacity: [0, 1], y: [40, 0], scale: [0.96, 1] }, { duration: 0.6, delay: stagger(0.07), ease: EASE }), 0.15);
+  }
+
+  /* =============================================================== FAQ: ghost accordion */
+  const FAQ = [
+    ["Was it trained only on Stanford Cars?", "Yes. The detector, both classifiers and every threshold were trained or tuned on the Stanford Cars training split only (with a validation split carved out of it). The backbones start from public pre-trained weights (ImageNet-22k for ConvNeXt, LAION-2B for CLIP, COCO for YOLO). The 8,041 test images were never used for training or tuning."],
+    ["What does “hybrid” mean here?", "Classical computer vision and deep learning each do the job they are best at. Classical methods measure and repair the image and give a transparent baseline (HOG, LBP, colour, geometry). Deep networks find the car and name it. The hybrid layer calibrates, combines and decides when to trust the answer."],
+    ["How is the confidence calculated?", "Each network outputs a softmax probability for all 196 classes. Temperature scaling (T = 0.65 for ConvNeXt, 0.5 for CLIP, fitted on validation) calibrates them, then Final = 0.3 × ConvNeXt + 0.7 × CLIP. The shown confidence is the top class's final probability. Its calibration error is 0.011, so 80% confidence really means about 80% right."],
+    ["What happens with a car it was never trained on?", "An open-set check compares the photo with about 950 car names using CLIP. If the car looks outside the 196 classes, AutoLens answers make-first: it names the model only when it is very sure, otherwise “<make>, model not recognised” or “unknown car”. In our tests this cut wrong answers on unseen cars from 26% to 17% (car in the catalogue) and from 66% to 35% (car not in the catalogue)."],
+    ["What if I upload something that is not a car?", "The CLIP vehicle gate compares the image with car and non-car prompts. Anything below the threshold returns “No car detected” instead of a forced guess. It accepted 99.89% of real test cars and rejected all 16 non-car probe photos."],
+    ["Are my photos stored or shared?", "No. Photos are processed in memory for one request and then discarded. The system recognises vehicle types only: no number plates, people or tracking."],
+  ];
+  $("#acc").innerHTML = FAQ.map(([q, a], i) => `<details${i ? "" : " open"}><summary><span class="mono">${String(i + 1).padStart(2, "0")}</span><b>${esc(q)}</b><span class="acc__x" aria-hidden="true"></span></summary><div class="acc__body"><p>${esc(a)}</p></div></details>`).join("");
+  $$("#acc details").forEach((d) => d.addEventListener("toggle", () => {
+    if (d.open) { anim($(".acc__body", d), { opacity: [0, 1], y: [-8, 0] }, { duration: 0.35, ease: EASE }); $$("#acc details").forEach((o) => o !== d && (o.open = false)); }
+  }));
+  { const items = $$("#acc details"); if (live) items.forEach((c) => (c.style.opacity = 0)); onView($("#acc"), () => anim(items, { opacity: [0, 1], x: [-20, 0] }, { duration: 0.5, delay: stagger(0.06), ease: EASE }), 0.15); }
+
+  /* =============================================================== team: glow cards */
+  const CREW = [["KI", "Kevin Isaac", "1RUA24CSE0200"], ["KC", "Kokila C G", "1RUA24CSE0206"], ["DV", "Dhruthishree V", "1RUA24CSE0130"]];
+  $("#crew").innerHTML = CREW.map(([ini, n, u]) => `<article class="mate"><span class="mate__av" aria-hidden="true">${ini}</span><b>${n}</b><span class="mono">${u}</span></article>`).join("");
+  { const m = $$("#crew .mate"); if (live) m.forEach((c) => (c.style.opacity = 0)); onView($("#crew"), () => anim(m, { opacity: [0, 1], y: [40, 0], rotateX: [20, 0] }, { type: "spring", stiffness: 140, damping: 16, delay: stagger(0.1) }), 0.2); }
+
   /* =============================================================== boot */
+  addGlow();
   buildPipeline();
   loadNumbers();
   boot();

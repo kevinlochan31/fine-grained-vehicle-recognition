@@ -28,7 +28,8 @@ from src import config as C
 from src.data import cache_path, crop_image, read_rgb
 
 W = C.WORK_DIR / "world_cars"
-MAX_REF = 20          # reference photos per model (all usable photos that are not in the test set)
+MAX_REF = 60          # reference/training photos per model (all usable photos that are not in the test set)
+MAX_REF_FGVD = 120    # extra FGVD street crops per generation (on top of the Commons references)
 # Frozen held-out test set: once written, later re-selections (e.g. after downloading more photos) keep exactly
 # these test photos, so accuracy before/after stays comparable.
 _FZ = W / "test_frozen.csv"
@@ -47,6 +48,11 @@ def select():
     from src.openvocab import CarVision
     import open_clip
     df = pd.read_csv(W / "photos.csv")
+    # extra Indian street-photo crops (scripts/import_fgvd.py) come with a fixed split in "preset"
+    if (W / "photos_fgvd.csv").exists():
+        df = pd.concat([df, pd.read_csv(W / "photos_fgvd.csv")], ignore_index=True)
+    if "preset" not in df:
+        df["preset"] = None
     cv, det = CarVision(device="cuda"), VehicleDetector(device="cuda")
     m, _, _ = open_clip.create_model_and_transforms(*BACKBONES["b16"])
     m = m.eval().cuda(); tok = open_clip.get_tokenizer("ViT-B-16")
@@ -74,7 +80,7 @@ def select():
     emb = dict(zip(q.file, q.emb))
     rng = random.Random(0)
     split = {}
-    for key, g in df[df.keep].groupby("key", sort=False):
+    for key, g in df[df.keep & df.preset.isna()].groupby("key", sort=False):
         files = list(g.file)
         # near-duplicate removal within the model
         kept = []
@@ -103,7 +109,7 @@ def select():
             for fl in frozen:
                 split[fl] = ("test", disjoint)
             continue
-        if FROZEN or len(g) < 4:
+        if len(g) < 4:            # models added after the test set was frozen get their own fresh test split
             continue
         authors = list(g.groupby("author").file.apply(list).items())
         rng.shuffle(authors)
@@ -126,6 +132,17 @@ def select():
             split[fl] = ("ref", disjoint)
         for fl in test:
             split[fl] = ("test", disjoint)
+    # preset rows (FGVD street crops): their own train/test split by scene, capped per generation; a test crop is
+    # only kept for generations that have reference photos
+    fg = df[df.keep & df.preset.notna()]
+    for key, g in fg.groupby("key", sort=False):
+        refs = list(g[g.preset == "ref"].file); rng.shuffle(refs)
+        for fl in refs[:MAX_REF_FGVD]:
+            split[fl] = ("ref", True)
+    has_ref = {df.key[i] for i, f in df.file.items() if split.get(f, (None,))[0] == "ref"}
+    for fl, key in zip(fg[fg.preset != "ref"].file, fg[fg.preset != "ref"].key):
+        if key in has_ref:
+            split[fl] = (fg.preset[fg.file == fl].iloc[0], True)
     df["set"] = df.file.map(lambda f: split.get(f, (None, None))[0])
     df["author_disjoint"] = df.file.map(lambda f: split.get(f, (None, None))[1])
     df.to_csv(W / "selected.csv", index=False)

@@ -68,7 +68,7 @@ The diagram is generated from `docs/make_architecture.py`. Each box maps to code
 | Classical features + PCA + logistic regression | `src/classical.py::extract_features`, `scripts/train_classical.py` |
 | Calibrated ensemble, late fusion, hierarchical low-confidence handling | `src/pipeline.py::VehicleRecognizer.run / describe` |
 | Open-set check and open-vocabulary naming (954-model catalogue) | `src/pipeline.py::_open_set`, `data_meta/car_catalogue.json` |
-| World-car layer (extra; 4,689-entry catalogue, SigLIP reference-photo probe) | `src/worldcars.py`, `src/pipeline.py::_world_answer`, `data_meta/world_catalogue.json`, `models/world_gallery.npz` |
+| World-car layer (extra; 4,689-entry catalogue, fine-tuned SigLIP over 735 generations) | `src/worldcars.py`, `src/pipeline.py::_world_answer`, `data_meta/world_catalogue.json`, `models/world_gallery.npz` |
 | Web UI / API | `web/`, `app.py` |
 
 ## 4. Classical computer vision components
@@ -293,10 +293,10 @@ the open-set routing rule or its thresholds.
    "exterior" check) and near-duplicate removal left 175 models. Each model is split into ≤ 5 reference and
    ≤ 3 test photos, by photographer for 98.3% of models: 841 reference, 512 test. Licence, author and
    source of every shipped thumbnail are in `data_meta/world_refs.csv` and `docs/world_photo_credits.md`.
-3. *Matcher* (`src/worldcars.py`): a linear probe on L2-normalised embeddings (mean of frame and YOLO crop)
-   over 175 world classes **plus the 196 Stanford classes** (Stanford train split), so a newer generation
-   of a trained family can be told apart from the trained one. Probabilities are temperature-scaled
-   (T = 0.21) on reference-photo cross-validation + Stanford val.
+3. *Matcher* (`src/worldcars.py`): a classifier on L2-normalised embeddings (mean of frame and YOLO crop)
+   over the world classes **plus the 196 Stanford classes** (Stanford train split), so a newer generation
+   of a trained family can be told apart from the trained one. Round 1 used a linear probe on frozen
+   SigLIP (175 models, T = 0.21); Phase II fine-tunes SigLIP end to end over 246 models (see below).
 4. *Decision* (`pipeline._open_set`): (a) if the probe's best class is a world model with p ≥
    `world_route_conf` = 0.95, the classifier's "known class" verdict is overridden. The threshold is set so
    0 of 788 Stanford val cars get a world answer. (b) On the open-set path, p ≥ `world_name_conf` = 0.95
@@ -324,36 +324,103 @@ closest models as hints, at p ≥ `world_make_conf` = 0.95 (lowest threshold wit
 It comes after the model-naming steps, so it never replaces a model name. A model-level tier (summed over
 generations) never reached 95% precision in tuning, so its threshold is 0.99 (effectively off).
 
-**More reference photos.** The backbone comparison used 841 references (≤ 5 per model). The live gallery
-uses 2,103 (≤ 20 per model, median 10; up to 40 candidates downloaded for models that had few), with the
-512 test photos frozen. Forced choice rises to 94.1% / 88.5% / 88.1% (make / model / generation).
-Some new Indian models simply have very few free photos on Commons (Brezza 2022: 2, Hyryder: 3).
+**More reference photos (round 1).** The backbone comparison used 841 references (≤ 5 per model). Round 1
+used 2,103 (≤ 20 per model), with the 512 test photos frozen: forced choice 94.1% / 88.5% / 88.1% (make /
+model / generation); end to end 60.9% right generation, 12.7% unknown, 5.1% wrong.
 
-**End to end (full app pipeline, 512 held-out photos).** Right make + model + generation 60.9%, right
-model 7.6%, right make only 13.7%, "unknown car" 12.7%, **wrong 5.1%**. Indian-market subset (212):
-46.7% / 13.7% / 21.2% / 11.8% / 6.6%. Without the layer: right model
-20.9%, make only 24.2%, unknown 40.0%, **wrong 14.8%**. When a generation is named it is right 98.2% of
-the time.
+**Phase II: fine-tuned SigLIP on a larger gallery** (`scripts/train_world.py`). A second download round
+added older and more Indian-market generations (Indica, Indigo, Santro, older Swift / Dzire / Alto,
+Qualis, City 1996–2013, Contessa…): 11,193 photos of 282 models, of which 246 models / 7,606 reference /
+714 test photos survive the filter (the 512 round-1 test photos stay frozen; new models get their own test
+split, author-disjoint for 96.7% of models). The frozen probe was replaced by end-to-end fine-tuning of the
+SigLIP ViT-B/16 image tower with a cosine head (learnable scale, prototype initialisation) over the 246
+world + 196 Stanford classes. Recipe: AdamW (backbone lr 2e-5 with layer-wise decay 0.8, head 1e-3, wd
+0.05), 1 warm-up epoch then cosine, 14 epochs, batch 48, bf16 autocast + gradient checkpointing (fits 8 GB),
+label smoothing 0.1, RandomResizedCrop / flip / colour jitter / blur / random erasing, sqrt-inverse
+class-balanced sampling, 60% YOLO crops / 40% full frames. Two runs: *tune* (every 5th reference photo and
+10% of models held out) gives temperature and thresholds; *final* (all photos) is shipped
+(`models/world_siglip_ft.pt`, 177 MB fp16). Tune-run validation top-1 rose from 0.94 after one epoch to
+0.969. Because fine-tuning breaks the image–text alignment, the original SigLIP tower is kept for zero-shot
+naming of catalogue cars without photos. Thresholds: name 0.95 (utility +1 / −1), model 0.95 and make 0.85
+(lowest with ≥ 95% precision), route 0.95 (0 Stanford val cars re-routed).
 
-**Teaching new cars (user's own photos).** `WorldCars.teach` embeds the user's photos (YOLO crop + frame,
-SigLIP) and retrains only that car's probe row against the frozen rows, using the original recipe
-(class-balanced cross-entropy, Adam lr 1e-2, weight decay 1e-4, raw logit space, then the tuned temperature).
-A new car starts from its prototype; a car already in the gallery continues from its tuned row (retraining
-it from scratch made it slightly worse in testing). It takes about 1 s on the GPU. State is replayed at
-start-up from `WORK_DIR/world_cars/user_teach/state.json`, which never enters the repository. Simulated
-on 30 models (removed, then taught back from 3 / 5 of their reference photos): 36.7% / 43.3% of their
-held-out photos named with the right generation at p ≥ 0.95, and 0.02% / 0.03% of all other test photos
-wrongly named as the taught car. With no taught cars, every reported number above is unchanged.
+| Held-out forced choice | Make | Model | Generation |
+|---|---|---|---|
+| Round-1 probe, 512 frozen photos | 94.1% | 88.5% | 88.1% |
+| Fine-tuned, same 512 photos | **96.5%** | **93.9%** | **93.7%** |
+| Fine-tuned, all 714 photos | 95.7% | 92.9% | 92.2% |
+
+**End to end (full app pipeline).** On the 512 frozen photos: right make + model + generation **80.4%**
+(round 1: 60.9%), right model 5.9%, make only 6.7%, unknown 4.1% (12.7%), **wrong 2.9%** (5.1%). On all
+714: 77.7% / 5.3% / 7.3% / 5.5% / 4.2%. Indian-market subset (430): 69.3% / 6.7% / 10.0% / 7.9% / 6.0%;
+rest of the world (284): 90.5% / 3.2% / 3.2% / 1.8% / 1.4%. The 71 new models alone: 70.9% right
+generation, 7.4% wrong; most errors are near-twins (Verna / Accent, Figo / Fiesta, Vento / Jetta,
+Manza / Indica). Without the layer: right model 20.9%, make only 24.2%, unknown 40.0%, **wrong 14.8%**
+(512 photos). When a generation is named it is right 98.9% of the time, for 80.0% of photos.
+
+**Round 3: 735 generations and "not sure" instead of wrong.** A third download round targeted every 2012+
+generation of 34 makes sold in India (India-market makes first), with a better Commons resolver (ordinal
+generation sub-categories, variant models such as Thar Roxx / Harrier EV kept apart, a file-title search
+fallback): 32,629 photos of 800 generations, of which 735 generations / 23,435 reference / 2,149 test photos
+survive the filter (author-disjoint for 97.6% of models). Same recipe; each run takes ~55 min. Forced choice:
+96.0% / 85.5% / 82.3% on all 2,149 test photos, 95.9% / 92.0% / 90.2% on the 510 frozen ones (more and
+thinner classes than Phase II).
+
+Three guards keep wrong answers down; each is calibrated on tune-run data only:
+1. *Disagreement check.* If the classifier is confident but the world head puts ≥ 0.20 of its probability on
+   non-Stanford classes, the answer becomes "Not sure · maybe <world match> or <classifier answer>"
+   (`Pipeline._not_sure`). 0.20 is the lowest threshold that doubts ≤ 0.5% of Stanford val (0.13%); it
+   catches 98.4% of leave-models-out negatives. On Stanford test it doubts 0.66%.
+2. *No naming from text alone.* With the world layer loaded, CLIP open-set names and catalogue zero-shot
+   names (no reference photo) are shown as "Not sure · maybe <guess>" (`Pipeline._maybe`). On the round-3 test
+   photos they were wrong 50 / 101 and 16 / 48 times.
+3. *Stricter tiers.* Make and model tiers now need ≥ 99% tune precision (was 95%): make 0.90 (was 0.35 on
+   round-3 data), model 0.99 (no grid point reached 99%, so the cap is used).
+
+End to end on all 2,149 photos: right generation 59.3%, right model 2.9%, make only 13.8%, no claim 20.4%,
+**wrong 3.6%** (7.4% before guards 2–3; 19.5% without the world layer). On the 510 frozen photos: 69.8% /
+4.7% / 9.2% / 14.9% / **1.4%** (Phase II: 80.4% / 5.9% / 6.7% / 4.1% / 2.9%). The remaining errors are mostly
+twins or two names for one car (Creta / ix25, Jazz / Fit, Q7 / SQ7, 5 Series / i5).
+
+*Best guess.* Every no-claim answer (unknown, unknown-model, not sure) carries the world layer's top match
+when it is a non-Stanford car with p ≥ 0.2 (`pred["best_guess"]`); the UI shows it with question marks.
+
+**Round 4: Indian street photos (FGVD).** `scripts/import_fgvd.py` crops every `car_*` box of FGVD
+(Khoba et al., ICVGIP 2022, CC BY 4.0, IDD street scenes from 2017–18) with 8% context, skips boxes under
+80 px and "Others/Covered", and maps labels to the catalogue. The generation is the only one on sale by 2019,
+or else the round-3 layer's choice among the candidates, kept only at p ≥ 0.6 (184 crops dropped as
+unclear). 6,214 crops of 114 generations; train/val crops become references (≤ 120 per generation: 3,610
+used), test crops a separate street test set (1,135 with references). Retrained with the same recipe:
+746 generations, 27,045 references. Forced choice 96.4 / 86.1 / 82.5% on all Commons test photos, 96.3 /
+92.7 / 91.0% on the frozen 510. End to end on the street crops: right generation 16.7% → **69.5%**, wrong
+7.5% → **2.9%**, no claim 60.3% → 14.4%. On Commons test: 59.3% → 58.0% right generation, 3.6% → 4.1% wrong
+(frozen 510: 69.8 → 67.3%, wrong 1.4 → 1.2%). Round 4 is kept for its street-photo gain; the round-3 model is
+backed up in `WORK_DIR/world_cars/models_round3`.
+
+**Self-learning (replaces manual teaching).** When the app names a generation from reference photos at
+p ≥ 0.97, `WorldCars.auto_learn` imprints the photo's embedding into that class row of the cosine head:
+d ← normalize((1−a)·d₀ + a·m), a = n / (n + max(n_ref, 5)), keeping the row norm and bias (a new class gets
+the median norm and bias). Cap 15 photos per class, dedup at cosine > 0.97, state in
+`WORK_DIR/world_cars/user_teach/auto_state.json` versioned by an md5 of the head bias, so it is dropped when
+the model is retrained. The earlier per-row gradient refit (`_fit_row_probe`) was written for the round-1
+linear probe; on the fine-tuned cosine head it collapsed the row (a correct Grand Vitara fell from p 0.36 to
+0.002 after one teach). Imprinting simulation on tune-run held-out photos: named 83.7% → 88.0%, top-1 94.0% →
+95.3%, wrong-name rate 0.003% → 0.005%; unseen held-out cars added from 3 photos: top-1 97.6%, named 92.1%,
+false positives 0.64%. The Teach panel is hidden in the UI. With no learnt photos, every number above is
+unchanged.
 
 **Stanford safety.** Hybrid 95.90% / 99.75% top-1 / top-5 (unchanged models, recomputed). Known-car
-re-routing on test is 0.796% before and after (+0.0%). On 500 random Stanford test images run end to end,
-0.2% of displayed answers changed and confident-correct stayed at 93.4%.
+re-routing on test is 0.796% before and after (+0.0%): with the fine-tuned layer, 0 of 8,041 Stanford
+test cars get a world answer (round-3 head alone: 95.8% top-1 on them). On 500 random Stanford test
+images run end to end with round 3, 0.8% of displayed answers changed and confident-correct went from 93.4%
+to 93.2% (one car shown as "not sure").
 
-**Limits.** Only 175 models have reference photos. The remaining catalogue models are named zero-shot at
-best, without a generation. Facelifts within a generation are not separated. Some old Indian cars
-(Maruti 800, Omni, Zen) are still confused, partly because the classifier is confidently wrong on them
-(e.g. "Volkswagen Golf Hatchback 1991") and the world probe is not confident enough to override it.
-Commons photos are skewed toward clean daytime shots, so street photos at night will score lower.
+**Limits.** Only 735 generations have reference photos. The rest of the catalogue can only be guessed from
+text and is shown as "not sure". The newest Indian cars (Thar 2nd gen, Harrier, Punch, Scorpio-N, Venue,
+Exter) have few or no free photos on Commons, and FGVD predates them, so they come out as "not sure" with a best guess. Facelifts within a generation are not separated. Some Indian models have very
+few free photos (Premier Rio: 2, Contessa: 6) or none (Force Trax, Citroen eC3). Badge-engineered twins
+remain the main error. Commons photos are skewed toward clean daytime shots; the FGVD crops add real
+Indian traffic, but night photos are still rare.
 
 ## 9. Failure-case analysis
 

@@ -52,17 +52,27 @@ class WorldCars:
         z = np.load(GALLERY, allow_pickle=False)
         meta = json.loads(str(z["meta"]))
         self.name = meta.get("name", "b16")
-        self.model = None
+        self.model = self.zs_model = None
         if self.name != "b16":
             # A bigger CLIP chosen for the world layer only (the vehicle gate, routing and the 196-class
             # models keep their tuned ViT-B/16). Loaded once; only its image tower is kept.
+            import copy
             import open_clip
             import torch
             self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
             m, _, self.prep = open_clip.create_model_and_transforms(meta["arch"], pretrained=meta["pretrained"])
-            self.model = m.visual.eval().to(self.device)
+            self.model = m.visual.eval()
+            if meta.get("weights"):
+                # Fine-tuned image tower (scripts/train_world.py). Its features no longer line up with the text
+                # tower, so the untouched pretrained tower is kept for zero-shot naming of cars without photos.
+                self.zs_model = copy.deepcopy(self.model).to(self.device)
+                sd = torch.load(C.MODELS_DIR / meta["weights"], map_location="cpu")
+                self.model.load_state_dict({k: v.float() for k, v in sd.items()})
+            self.model = self.model.to(self.device)
             if self.device == "cuda":
                 self.model = self.model.half()
+                if self.zs_model is not None:
+                    self.zs_model = self.zs_model.half()
             del m
         self.classes = [dict(c) for c in meta["classes"]]
         self.K = meta["n_world"]
@@ -71,7 +81,7 @@ class WorldCars:
         with open(REFS, encoding="utf8") as f:
             self.refs = list(csv.DictReader(f))
         self.user_X, self.user_y = [], []
-        t = np.load(C.MODELS_DIR / f"world_text_{self.name}.npz", allow_pickle=False)
+        t = np.load(C.MODELS_DIR / f"world_text_{meta.get('zero_shot_backbone', self.name)}.npz", allow_pickle=False)
         self.t_models, self.t_scale = t["t"].astype(np.float32), float(t["scale"])
         self.t_make, self.t_model = [str(x) for x in t["makes"]], [str(x) for x in t["models"]]
         self.stanford_names = meta["stanford_classes"]
@@ -81,7 +91,12 @@ class WorldCars:
         self.gens = {}
         for e in cat:
             self.gens.setdefault((e["make"], e["model"]), []).append(e)
+        # identifies this trained gallery: embeddings saved for an older training run are not reused
+        import hashlib
+        self.version = hashlib.md5(np.ascontiguousarray(z["b"]).tobytes()).hexdigest()[:12]
         self.taught = []                       # user-taught entries (replayed from USER_DIR/state.json)
+        self.auto = []                         # self-learnt entries (replayed from USER_DIR/auto_state.json)
+        self._base = {}                        # tuned row (and its reference count) of every updated car
         self._replay()
 
     # ------------------------------------------------------------------ grouping for the middle tiers
@@ -128,6 +143,36 @@ class WorldCars:
         return k
 
     def _fit_row(self, k, steps=400):
+        """Update row k from the user / self-learnt photos of that car. The shipped head is a cosine
+        classifier (row = scale x unit direction), so the row is 'imprinted': its direction moves towards the
+        mean embedding of the new photos, weighted by how many there are against the car's reference photos,
+        and its length (scale) and bias stay as tuned. A new car gets the mean direction, the median scale and
+        the median bias of the world rows. (Re-fitting the row by gradient descent, as the round-1 linear probe
+        did, wrecks a fine-tuned row: p(true) on its test photos fell from 0.36 to 0.002 with no new data.)"""
+        if getattr(self, "cosine_head", True):
+            fs = [x for x, y in zip(self.user_X, self.user_y) if y == k]
+            if not fs:
+                return
+            m = np.mean(fs, 0); m = m / max(1e-6, float(np.linalg.norm(m)))
+            norms = np.linalg.norm(self.W[:self.K], axis=1)
+            if self.classes[k].get("user") and not self.classes[k].get("_trained"):
+                others = [i for i in range(self.K) if i != k]
+                self.W[k] = float(np.median(norms[others])) * m
+                self.b[k] = float(np.median(self.b[others]))
+                self.classes[k]["_trained"] = True
+                self._base[k] = (self.W[k].copy(), 0)
+                return
+            if k not in self._base:              # tuned row + how many reference photos it stands for
+                self._base[k] = (self.W[k].copy(), int((self.ref_cls == k).sum()))
+            w0, n_ref = self._base[k]
+            r = float(np.linalg.norm(w0)); d0 = w0 / r
+            a = len(fs) / (len(fs) + max(n_ref, 5))          # 3 new photos vs 20 references -> 13% of the way
+            d = (1 - a) * d0 + a * m
+            self.W[k] = r * d / float(np.linalg.norm(d))
+            return
+        self._fit_row_probe(k, steps)
+
+    def _fit_row_probe(self, k, steps=400):
         """Train row k only (all other rows frozen) on base data + every user photo, with balanced weights."""
         # Same recipe as the original probe (scripts/eval_world.fit_probe): raw (pre-temperature) logit space,
         # class-balanced cross-entropy, prototype x 10 initialisation, Adam lr 1e-2 with weight decay 1e-4,
@@ -161,7 +206,30 @@ class WorldCars:
             torch.nn.functional.cross_entropy(logits, yt, weight=wts).backward(); opt.step()
         self.W[k] = w.detach().cpu().numpy() / T; self.b[k] = float(bb.detach().cpu()) / T
 
-    def teach(self, make, model, gen, years, y0, y1, feats, images, save=True) -> dict:
+    AUTO_MAX_PER_CLASS = 15
+
+    def auto_learn(self, make, model, gen, years, y0, y1, feat, image) -> bool:
+        """Self-learning: add a photo the layer itself named with high confidence as an extra reference of that
+        car (no user input). Capped per car and skipped for near-duplicates, so repeats of one photo cannot
+        drag a row. Returns True when the photo was learnt."""
+        if self.train_X is None:
+            return False
+        k = self._find_class(make, model, y0)
+        if k is None:
+            return False
+        mine = [np.asarray(f, np.float32) for e in self.auto if (e["make"], e["model"], e["y0"]) == (make, model, y0)
+                for f in e["feats"]]
+        feat = np.asarray(feat, np.float32)
+        if len(mine) >= self.AUTO_MAX_PER_CLASS or any(float(feat @ m) > 0.97 for m in mine):
+            return False
+        self.teach(make, model, gen, years, y0, y1, [feat], [image], save=False, author="self-learnt by AutoLens")
+        self.auto.append(dict(make=make, model=model, gen=gen, years=years, y0=y0, y1=y1, images=[image],
+                              feats=[feat.round(6).tolist()]))
+        USER_DIR.mkdir(parents=True, exist_ok=True)
+        (USER_DIR / "auto_state.json").write_text(json.dumps(dict(version=self.version, auto=self.auto)), encoding="utf8")
+        return True
+
+    def teach(self, make, model, gen, years, y0, y1, feats, images, save=True, author="you (taught in AutoLens)") -> dict:
         """Add the user's photos (feats: L2-normalised embeddings from self.embed) as references of a car and
         retrain only that car's row. Returns a summary. images: list of (thumbnail path relative to USER_DIR)."""
         if self.train_X is None:
@@ -176,7 +244,7 @@ class WorldCars:
             self.user_X.append(np.asarray(f, np.float32)); self.user_y.append(k)
             self.ref_emb = np.concatenate([self.ref_emb, np.asarray(f, np.float32)[None]])
             self.ref_cls = np.append(self.ref_cls, k)
-            self.refs.append(dict(image=f"user_refs/{im}", author="you (taught in AutoLens)", license="your photo",
+            self.refs.append(dict(image=f"user_refs/{im}", author=author, license="your photo",
                                   license_url="", source="", title=im, user="1"))
         self._fit_row(k)
         n_refs = int((self.ref_cls == k).sum())
@@ -203,34 +271,54 @@ class WorldCars:
 
     def _save(self):
         USER_DIR.mkdir(parents=True, exist_ok=True)
-        (USER_DIR / "state.json").write_text(json.dumps(dict(backbone=self.name, taught=self.taught)), encoding="utf8")
+        (USER_DIR / "state.json").write_text(json.dumps(dict(backbone=self.name, version=self.version,
+                                                             taught=self.taught)), encoding="utf8")
 
     def _replay(self):
-        p = USER_DIR / "state.json"
-        if getattr(self, "_skip_replay", False) or not p.exists() or self.train_X is None:
+        if getattr(self, "_skip_replay", False) or self.train_X is None:
             return
-        st = json.loads(p.read_text(encoding="utf8"))
-        if st.get("backbone") != self.name:
-            return                                          # taught with another backbone: embeddings incompatible
-        for e in st.get("taught", []):
-            self.teach(e["make"], e["model"], e["gen"], e["years"], e["y0"], e["y1"], e["feats"], e["images"], save=False)
-            self.taught.append(e)
+        p = USER_DIR / "state.json"
+        if p.exists():
+            st = json.loads(p.read_text(encoding="utf8"))
+            # taught with another backbone or an older training run: embeddings incompatible
+            if st.get("backbone") == self.name and st.get("version", self.version) == self.version:
+                for e in st.get("taught", []):
+                    self.teach(e["make"], e["model"], e["gen"], e["years"], e["y0"], e["y1"], e["feats"], e["images"],
+                               save=False)
+                    self.taught.append(e)
+        p = USER_DIR / "auto_state.json"
+        if p.exists():
+            st = json.loads(p.read_text(encoding="utf8"))
+            if st.get("version") == self.version:
+                for e in st.get("auto", []):
+                    if self._find_class(e["make"], e["model"], e["y0"]) is None:
+                        continue
+                    self.teach(e["make"], e["model"], e["gen"], e["years"], e["y0"], e["y1"], e["feats"], e["images"],
+                               save=False, author="self-learnt by AutoLens")
+                    self.auto.append(e)
 
-    def embed(self, full: np.ndarray, crop: np.ndarray | None) -> np.ndarray:
+    def embed(self, full: np.ndarray, crop: np.ndarray | None, model=None) -> np.ndarray:
         """Mean of frame + crop embeddings with the world layer's own backbone (when it is not the live B/16)."""
         import torch
         from PIL import Image
         ims = [full] + ([crop] if crop is not None else [])
         x = torch.stack([self.prep(Image.fromarray(i)) for i in ims]).to(self.device)
         with torch.no_grad():
-            f = self.model(x.half() if self.device == "cuda" else x).float()
+            f = (model or self.model)(x.half() if self.device == "cuda" else x).float()
         f = f / f.norm(dim=-1, keepdim=True)
         f = f.mean(0)
         return (f / f.norm()).cpu().numpy()
 
-    def match(self, feature: np.ndarray) -> dict:
-        """feature: L2-normalised CLIP ViT-B/16 embedding (mean of frame + crop) from CarVision.analyse."""
+    def embed_pair(self, full: np.ndarray, crop: np.ndarray | None):
+        """(feature for the trained head, feature for zero-shot text naming)."""
+        f = self.embed(full, crop)
+        return f, (self.embed(full, crop, self.zs_model) if self.zs_model is not None else f)
+
+    def match(self, feature: np.ndarray, zs_feature: np.ndarray | None = None) -> dict:
+        """feature: L2-normalised embedding (mean of frame + crop) from the world backbone (or the live B/16).
+        zs_feature: embedding for zero-shot text naming when it differs (fine-tuned backbone)."""
         f = feature.astype(np.float32)
+        fz = f if zs_feature is None else zs_feature.astype(np.float32)
         p = _softmax(self.W @ f + self.b)
         k = int(p.argmax())
         kw = int(p[:self.K].argmax())
@@ -239,7 +327,7 @@ class WorldCars:
         sims = self.ref_emb[idx] @ f
         j = int(idx[int(sims.argmax())])
         ref = self.refs[j]
-        pz = _softmax(self.t_scale * self.t_models @ f)
+        pz = _softmax(self.t_scale * self.t_models @ fz)
         zi = int(pz.argmax())
         # zero-shot make distribution over the catalogue (for the make-consistency check)
         zmake = {}
@@ -267,6 +355,8 @@ class WorldCars:
         make_tier = dict(make=self.make_display.get(mk_name, mk_name), p=float(pmk[ki]), candidates=cand_names[:3])
         return dict(model_tier=model_tier, make_tier=make_tier,
                     top_is_world=k < self.K, p_top=float(p[k]), stanford_class=(k - self.K) if k >= self.K else -1,
+                    # belief that the car is NOT one of the 196 Stanford classes (used to doubt the classifier)
+                    world_mass=float(p[:self.K].sum()),
                     cls=c, p=float(p[kw]), ref=ref, ref_sim=float(sims.max()),
                     zs_make=self.t_make[zi], zs_model=self.t_model[zi], zs_p=float(pz[zi]),
                     zs_make_probs=zmake)

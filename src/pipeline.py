@@ -204,14 +204,16 @@ class VehicleRecognizer:
                     views.append(enh)
             # Hybrid: average the CNN over the original and the classically enhanced view
             # (each with flip-TTA). Replacing the original by the enhanced crop was worse.
-            probs = self.classifier.predict_proba(views, tta=(mode == "hybrid" and cfg.get("tta", True))).mean(0)
-            probs = self._calibrate(probs, cfg.get("temperature", 1.0))   # fitted on validation
+            raw = self.classifier.predict_proba(views, tta=(mode == "hybrid" and cfg.get("tta", True))).mean(0)
+            probs = self._calibrate(raw, cfg.get("temperature", 1.0))   # fitted on validation
+            members = dict(convnext_raw=raw, convnext=probs)          # kept for "show the working"
             ctx["members_agree"] = None
             if mode == "hybrid" and self.clip_ft is not None:
                 # ensemble with the robust CLIP fine-tune (weights + temperature fitted on validation)
-                pc = self.clip_ft.predict_proba(views, tta=True).mean(0)
-                pc = self._calibrate(pc, cfg.get("clip_temperature", 1.0))
+                pc_raw = self.clip_ft.predict_proba(views, tta=True).mean(0)
+                pc = self._calibrate(pc_raw, cfg.get("clip_temperature", 1.0))
                 w = cfg.get("ensemble_weight", 0.5)
+                members.update(clip_raw=pc_raw, clip=pc, ensemble_weight=w)
                 ctx["members_agree"] = int(probs.argmax()) == int(pc.argmax())
                 probs = w * probs + (1 - w) * pc
             w = cfg.get("fusion_weight", 0.0)
@@ -225,6 +227,8 @@ class VehicleRecognizer:
         pred = self.describe(probs, conf_t, make_t)
         pred["in_training_set"] = True
         pred["car_probability"] = ctx.get("gate", 1.0)
+        if mode == "hybrid" and mode != "classical":
+            pred["members"], pred["final_probs"] = members, probs
         if mode == "hybrid" and "clip" in ctx:
             pred = self._open_set(pred, ctx, crop, cfg, probs)
         timings["total_ms"] = 1000 * (time.perf_counter() - t0)
@@ -232,6 +236,19 @@ class VehicleRecognizer:
                     crop=crop, enhancement_steps=steps, stats=stats, timings=timings, **pred)
 
     def _open_set(self, pred, ctx, crop, cfg, probs):
+        pred = self._open_set_decide(pred, ctx, crop, cfg, probs)
+        # Whenever no answer is claimed, still say what the world-car layer would pick (clearly as a guess),
+        # e.g. "maybe Maruti Suzuki Grand Vitara · 1st gen (50%)" for a car with only 10 reference photos.
+        wm = ctx.get("world")
+        if wm is not None and pred["status"] in ("unknown", "unknown-model", "not-sure") and wm["top_is_world"] \
+                and wm["p"] >= cfg.get("world_guess_floor", 0.2):
+            from .worldcars import describe_world
+            c = wm["cls"]
+            pred["best_guess"] = dict(label=describe_world(c), make=c["make"], model=c["model"], gen=c.get("gen"),
+                                      years=c.get("years"), p=float(wm["p"]))
+        return pred
+
+    def _open_set_decide(self, pred, ctx, crop, cfg, probs):
         """Decide whether the car is one of the 196 trained classes. If not (or if the classifier is too
         unsure to commit), answer responsibly: name the model only when the evidence is strong, otherwise
         report the make with "model not recognised", or "unknown car" when even the make is unclear."""
@@ -250,15 +267,20 @@ class VehicleRecognizer:
         wm = None
         if self.world is not None and "feature" in zs:
             if "world" not in ctx:
-                f = zs["feature"] if self.world.model is None else self.world.embed(
+                f, fz = (zs["feature"], None) if self.world.model is None else self.world.embed_pair(
                     ctx["rgb"], crop if ctx.get("det", {}).get("source", "").startswith("yolo") else None)
-                ctx["world"] = self.world.match(f)
+                ctx["world"] = self.world.match(f, fz)
             wm = ctx["world"]
         world_ok = wm is not None and wm["top_is_world"]
         # Override "this is a trained class" only on very strong reference-photo evidence (budget: <=0.1% of
         # Stanford val cars), e.g. a 2019 Camry that the classifier calls "Toyota Camry Sedan 2012".
         world_route = world_ok and wm["p"] >= cfg.get("world_route_conf", 1.01)
         if known and not world_route and pred["status"] != "low-confidence":
+            # Cross-check: the world head also knows the 196 classes. If much of its belief goes to cars
+            # outside them (e.g. a 2020+ Thar that the classifier calls "Jeep Wrangler 2012"), do not
+            # present the classifier's answer as confident. Threshold: <=0.5% of Stanford val doubted.
+            if wm is not None and wm.get("world_mass", 0.0) >= cfg.get("world_doubt_mass", 1.01):
+                return self._not_sure(pred, wm)
             return pred
         pred["closest_trained_class"] = pred["label"]
         if world_ok and wm["p"] >= cfg.get("world_name_conf", 1.01):
@@ -291,6 +313,21 @@ class VehicleRecognizer:
                             display="Unknown car (outside the supported classes?)")
             return pred
         pred["in_training_set"] = False
+        if wm is not None:
+            # With the world-car layer loaded, a car it cannot name from reference photos is not named from text
+            # alone: the CLIP open-set name was wrong for 50 of 101 such answers and the catalogue zero-shot name for
+            # 16 of 48 (world test photos, round 3). Show them as unconfirmed guesses instead.
+            guess = None
+            if named is not None:
+                e = V.entries[named]; guess = (e["label"], e["make"], float(zs["name_probs"][named]))
+            elif wm["zs_p"] >= cfg.get("world_zs_conf", 1.01) and _mk(wm["zs_make"]) == _mk(make):
+                guess = (f"{wm['zs_make']} {wm['zs_model']}", wm["zs_make"], float(wm["zs_p"]))
+            sure_make = (wm["make_tier"]["make"] if world_make
+                         else make if make_p >= cfg.get("unknown_make_conf", 0.5) else "")
+            if guess is not None:
+                return self._maybe(pred, guess, sure_make, wm)
+            if world_make:
+                return self._world_make(pred, wm["make_tier"])
         if named is not None:                                       # strong, make-consistent open-vocab name
             e = V.entries[named]
             pred.update(status="open-set", label=e["label"], make=e["make"], model=e["model"], year="unknown",
@@ -319,6 +356,36 @@ class VehicleRecognizer:
                         top5=[(l, p) for l, p, _ in zs["name_top5"]])
         return pred
 
+    def _not_sure(self, pred, wm):
+        """The two models disagree: show no answer, only what each of them thinks (both unconfirmed)."""
+        from .worldcars import describe_world
+        mass = wm["world_mass"]
+        w_label = describe_world(wm["cls"])
+        kt = wm["make_tier"]
+        same_make = _mk(kt["make"]) == _mk(pred["make"])
+        pred.update(status="not-sure", closest_trained_class=pred["label"], in_training_set=False,
+                    possibly_outside=True, make=pred["make"] if same_make else "", model="Not sure",
+                    year="unknown", confidence=float(pred["confidence"] * (1 - mass)),
+                    display=f"Not sure · maybe {w_label} or {pred['label']}",
+                    not_sure=dict(kind="disagree", world_mass=float(mass), classifier=pred["label"],
+                                  classifier_p=float(pred["confidence"]), world=w_label, world_p=float(wm["p"])),
+                    top5=[(f"{w_label} (world-car layer)", float(wm["p"]))] + list(pred["top5"])[:4])
+        return pred
+
+    def _maybe(self, pred, guess, sure_make, wm):
+        """Only a weak guess from text matching: show it as unconfirmed, keep the make only if it is reliable."""
+        from .worldcars import describe_world
+        label, g_make, p = guess
+        make = sure_make if _mk(sure_make) == _mk(g_make) else ""
+        w_label = describe_world(wm["cls"])
+        pred.update(status="not-sure", make=make, model="Not sure", year="unknown", possibly_outside=True,
+                    confidence=float(p), display=f"Not sure · maybe {label}",
+                    not_sure=dict(kind="guess", guess=label, guess_p=float(p), world=w_label, world_p=float(wm["p"]),
+                                  classifier=pred["closest_trained_class"], classifier_p=float(pred["confidence"])),
+                    top5=[(f"{label} (text match)", float(p)), (f"{w_label} (world-car layer)", float(wm["p"]))]
+                         + list(pred["top5"])[:3])
+        return pred
+
     def _world_make(self, pred, kt):
         hint = f" · closest: {', '.join(kt['candidates'])}" if kt["candidates"] else ""
         pred.update(status="unknown-model", label=f"{kt['make']} (model not recognised)", make=kt["make"],
@@ -332,7 +399,8 @@ class VehicleRecognizer:
         c, r = wm["cls"], wm["ref"]
         label = describe_world(c)
         extra = " · generation not certain" if level == "model" else ""
-        src = "your photos" if (c.get("user") or r.get("user")) else "reference photos"
+        self_learnt = str(r.get("author", "")).startswith("self-learnt")
+        src = "your photos" if (c.get("user") or (r.get("user") and not self_learnt)) else "reference photos"
         pred.update(status="world", label=label, make=c["make"], model=c["model"],
                     year=c.get("years") or ("generation not certain" if level == "model" else "unknown"),
                     confidence=wm["p"], in_training_set=False,
