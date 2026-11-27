@@ -356,7 +356,7 @@
 
   const stage = $("#stage"), viewer = $("#viewer"), photo = $("#photo"), overlay = $("#overlay");
   let beamCtl = null, loadTimer = null;
-  const STEPS = ["VALIDATING INPUT", "ACQUIRING VEHICLE · YOLO11", "MEASURING QUALITY", "ENHANCING · CLAHE / GAMMA", "CLASSIFYING · 196 CLASSES", "CROSS-CHECKING PIPELINES"];
+  const STEPS = ["VALIDATING INPUT", "ACQUIRING VEHICLE · YOLO11", "MEASURING QUALITY", "ENHANCING · CLAHE / GAMMA", "CLASSIFYING · 196 CLASSES", "MATCHING WORLD CARS", "CROSS-CHECKING PIPELINES"];
   function setLoading(on) {
     busy = on;
     stage.classList.toggle("is-loading", on); stage.setAttribute("aria-busy", on);
@@ -919,10 +919,12 @@
       ["hybrid", "Vehicle gate", "Is it even a car?", "CLIP ViT-B/16 scores car prompts against everyday non-car scenes; borderline scores need the detector to agree. Anything else returns 'No car detected'."],
       ["classical", "Adaptive enhancement", "Repairs the image", "Gamma for darkness, CLAHE with a contrast-aware clip limit, bilateral denoising and bicubic upscaling, only when needed."],
       ["deep", "Fine-grained ensemble", "Names the car", "ConvNeXt-Tiny (ImageNet-22k) + CLIP ViT-B/16 fine-tuned with harsh lighting, blur, JPEG, viewpoint and occlusion augmentation."],
-      ["classical", "Hand-crafted features", "A transparent baseline", "HOG shape, LBP texture, HSV colour, edge orientation and contour geometry. 14.5% top-1, about 28× chance."],
-      ["hybrid", "Calibrated decision", "Decides what to trust", "Averages both networks over the original and enhanced views with flip TTA, temperature-calibrated on validation."],
-      ["hybrid", "Open-set naming", "Knows what it doesn't know", "If the car is not one of the 196 classes, CLIP names it zero-shot from a 954-model catalogue (83 makes) and says so."],
-      ["hybrid", "Confidence back-off", "Never bluffs", "Low confidence falls back to make + model, then make only, then 'uncertain', each level checked on held-out data."],
+      ["hybrid", "Calibrated decision", "Decides what to trust", "Averages both networks over the original and enhanced views with flip TTA, temperature-calibrated on validation: 0.3 × ConvNeXt + 0.7 × CLIP."],
+      ["hybrid", "Confidence back-off", "Never bluffs", "Exact class only at ≥ 67%; otherwise make + model, then make only, each level checked on held-out data."],
+      ["hybrid", "Open-set check", "Knows what it doesn't know", "Is it one of the 196 classes? CLIP zero-shot (954 models) and the world-car head cross-check the answer. If they disagree, the result says 'Not sure · maybe …' instead of a confident name."],
+      ["deep", "World-car layer", "Cars beyond 2012", "Fine-tuned SigLIP ViT-B/16 over 746 generations (27,045 reference photos, incl. Indian street photos). Names make → model → generation only when ≥ 95% sure; otherwise a best guess marked with '?'. Text-only guesses are never shown as answers."],
+      ["hybrid", "Self-learning", "Gets better with use", "When the world layer is ≥ 97% sure, the photo becomes one more reference for that car (max 15 per car, near-duplicates skipped)."],
+      ["classical", "Hand-crafted baseline", "Runs alongside, for comparison", "HOG shape, LBP texture, HSV colour, edge orientation and contour geometry → PCA → logistic regression. 14.5% top-1, about 28× chance; its fusion weight is 0."],
     ];
     $("#pipeline-steps").innerHTML = S.map(([k, t, s, p], i) => `<li class="tstep"><div><span class="tstep__kind k-${k}">${String(i + 1).padStart(2, "0")} · ${k}</span></div><h3>${t}<br/><small class="muted" style="font:500 13px var(--font)">${s}</small></h3><p>${p}</p></li>`).join("");
     const steps = $$("#pipeline-steps .tstep"), fill = $("#timeline-fill");
@@ -1154,10 +1156,14 @@
     { id: "clip", c: 6, r: 2, k: "deep", t: "CLIP ViT-B/16 (tuned)", d: "CLIP's image encoder fine-tuned with harsh lighting, blur, JPEG and occlusion augmentation (zero-shot 87.2% → 96.7%). Calibrated with T = 0.5." },
     { id: "classical", c: 6, r: 3, k: "classical", dim: true, t: "HOG · LBP → LogReg", d: "The transparent baseline: 6,428 hand-crafted features (HOG, LBP, colour, edges, geometry) → PCA 256 → logistic regression. 14.5% top-1. Shown for comparison; its fusion weight is 0." },
     { id: "fuse", c: 7, k: "hybrid", t: "Calibrate + ensemble", d: "Final = 0.3 × ConvNeXt + 0.7 × CLIP, weights chosen on the validation split. Hybrid test accuracy: 95.90% top-1, 99.75% top-5, calibration error 0.011." },
-    { id: "answer", c: 8, k: "hybrid", t: "Back-off → answer", d: "Exact class if ≥ 67%, otherwise make + model, then make only. An open-set check flags cars outside the 196 classes and answers make-first instead of guessing." },
+    { id: "backoff", c: 8, r: 1, k: "hybrid", t: "Confidence back-off", d: "Exact class if ≥ 67%, otherwise make + model, then make only. A low-confidence class is never shown as the answer." },
+    { id: "openset", c: 8, r: 2, k: "hybrid", t: "Open-set check", d: "Is it one of the 196 classes? CLIP zero-shot (954 models) and the world-car head cross-check the answer. If the classifier is sure but the world head puts ≥ 20% on other cars, the result becomes \"Not sure · maybe …\"." },
+    { id: "world", c: 8, r: 3, k: "deep", t: "World-car layer", d: "Fine-tuned SigLIP ViT-B/16 over 746 generations (27,045 reference photos, incl. Indian street photos) and a 4,689-entry catalogue. Names make → model → generation only at ≥ 95%; learns from its own ≥ 97% answers." },
+    { id: "answer", c: 9, k: "hybrid", t: "Answer", d: "A name only when sure: the class, the generation, or just the make. Otherwise \"Not sure\" with a best guess marked \"?\". Text-only guesses are never shown as answers." },
   ];
   const EDGES = [["photo", "measure"], ["measure", "detect"], ["detect", "gate"], ["gate", "enhance"], ["enhance", "convnext"], ["enhance", "clip"],
-    ["enhance", "classical", 1], ["convnext", "fuse"], ["clip", "fuse"], ["classical", "fuse", 1], ["fuse", "answer"]];
+    ["enhance", "classical", 1], ["convnext", "fuse"], ["clip", "fuse"], ["classical", "fuse", 1], ["fuse", "backoff"], ["backoff", "openset"],
+    ["openset", "world"], ["world", "answer"]];
   const KLABEL = { io: "input", classical: "classical", deep: "deep", hybrid: "hybrid" };
   const flow = (() => {
     const grid = $("#flow-grid"), svg = $("#flow-svg"), canvas = $("#flow-canvas"), detail = $("#flow-detail");
@@ -1229,6 +1235,10 @@
     if (tbl) { vals.convnext = `${pct(tbl.convnext)} ${tbl.label.split(" ")[0]}`; vals.clip = `${pct(tbl.clip)} ${tbl.label.split(" ")[0]}`; vals.fuse = `→ ${pct(tbl.final)}`; }
     const c = d.results.classical;
     if (c) vals.classical = `${pct(c.confidence)} · ${c.label === r.label ? "agrees" : "differs"}`;
+    vals.backoff = `${pct(r.confidence)} · ${r.status}`;
+    vals.openset = r.not_sure ? "models disagree" : r.in_training_set ? "one of the 196" : "outside the 196";
+    const w = r.world, g = r.best_guess;
+    vals.world = w ? `${pct(w.p)} ${w.model || ""}`.trim() : g ? `guess: ${g.model}?` : r.in_training_set ? "not needed" : "no match";
     vals.answer = `${r.display}`;
     flow.set(vals, true);
   }
@@ -1263,10 +1273,10 @@
 
   /* =============================================================== FAQ: ghost accordion */
   const FAQ = [
-    ["Was it trained only on Stanford Cars?", "Yes. The detector, both classifiers and every threshold were trained or tuned on the Stanford Cars training split only (with a validation split carved out of it). The backbones start from public pre-trained weights (ImageNet-22k for ConvNeXt, LAION-2B for CLIP, COCO for YOLO). The 8,041 test images were never used for training or tuning."],
+    ["Was it trained only on Stanford Cars?", "The 196-class models, yes. The detector, both classifiers and their thresholds were trained or tuned on the Stanford Cars training split only (with a validation split carved out of it), starting from public pre-trained weights (ImageNet-22k for ConvNeXt, LAION-2B for CLIP, COCO for YOLO). The 8,041 test images were never used for training or tuning. The separate world-car layer, which handles newer and Indian cars, is a fine-tuned SigLIP trained on 27,045 freely licensed photos (Wikimedia Commons and the FGVD Indian street dataset); it never changes the 196-class results."],
     ["What does “hybrid” mean here?", "Classical computer vision and deep learning each do the job they are best at. Classical methods measure and repair the image and give a transparent baseline (HOG, LBP, colour, geometry). Deep networks find the car and name it. The hybrid layer calibrates, combines and decides when to trust the answer."],
     ["How is the confidence calculated?", "Each network outputs a softmax probability for all 196 classes. Temperature scaling (T = 0.65 for ConvNeXt, 0.5 for CLIP, fitted on validation) calibrates them, then Final = 0.3 × ConvNeXt + 0.7 × CLIP. The shown confidence is the top class's final probability. Its calibration error is 0.011, so 80% confidence really means about 80% right."],
-    ["What happens with a car it was never trained on?", "An open-set check compares the photo with about 950 car names using CLIP. If the car looks outside the 196 classes, AutoLens answers make-first: it names the model only when it is very sure, otherwise “<make>, model not recognised” or “unknown car”. In our tests this cut wrong answers on unseen cars from 26% to 17% (car in the catalogue) and from 66% to 35% (car not in the catalogue)."],
+    ["What happens with a car it was never trained on?", "An open-set check decides whether the car is one of the 196 classes. If not, the world-car layer (746 car generations with reference photos, 4,689 in the catalogue) names make → model → generation, but only when it is at least 95% sure. Otherwise AutoLens says “<make>, model not recognised” or “Not sure · maybe …” with its best guess marked “?”. A name guessed from text alone is never shown as the answer. On Indian street photos it is right 69.5% of the time and wrong only 2.9%."],
     ["What if I upload something that is not a car?", "The CLIP vehicle gate compares the image with car and non-car prompts. Anything below the threshold returns “No car detected” instead of a forced guess. It accepted 99.89% of real test cars and rejected all 16 non-car probe photos."],
     ["Are my photos stored or shared?", "No. Photos are processed in memory for one request and then discarded. The system recognises vehicle types only: no number plates, people or tracking."],
   ];

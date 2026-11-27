@@ -595,7 +595,7 @@ td.num, th.num { text-align: right; font-family: var(--mono); }
 .flow__svg .is-hot { stroke: var(--fg); }
 .flow__grid { position: relative; display: grid; gap: 18px 14px; grid-template-columns: 1fr; }
 @media (min-width: 1000px) {
-  .flow__grid { grid-template-columns: repeat(8, minmax(0, 1fr)); grid-template-rows: auto auto auto; align-items: center; gap: 14px 22px; }
+  .flow__grid { grid-template-columns: repeat(9, minmax(0, 1fr)); grid-template-rows: auto auto auto; align-items: center; gap: 14px 22px; }
   .fnode[data-c] { grid-column: var(--c); grid-row: var(--r, 2); }
 }
 .fnode { position: relative; z-index: 1; text-align: left; display: grid; gap: 4px; padding: 10px 11px; border-radius: 12px; border: 1px solid var(--line-2);
